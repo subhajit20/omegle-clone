@@ -6,9 +6,14 @@ type CallInfo = {
     answer?:RTCSessionDescriptionInit | null
 }
 
-function useVideoCall():any {
-    const [callInformation,setCallInformation] = useState<CallInfo | null>(null);
+type useVideoCallType = {
+    callInformation:CallInfo | null,
+    createOfferForRemoteUser:(peer:RTCPeerConnection,localStream:MediaStream) => Promise<RTCSessionDescription | null>,
+    createAnswerForLocalUser:(eer:RTCPeerConnection,localStream:MediaStream,remoteOffer:RTCSessionDescriptionInit) => Promise<RTCSessionDescriptionInit | null>
+}
 
+function useVideoCall():useVideoCallType {
+  const [callInformation,setCallInformation] = useState<CallInfo | null>(null);
 
   const createOfferForRemoteUser = async (peer:RTCPeerConnection,localStream:MediaStream):Promise<RTCSessionDescription | null> =>  {
     try{
@@ -70,7 +75,6 @@ function useVideoCall():any {
     }
     return null;
   }
-
 
   return {
     callInformation,
