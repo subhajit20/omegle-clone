@@ -1,11 +1,19 @@
 import dotenv from "dotenv";
 dotenv.config();
-import express, { Application, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
+import { WebSocketServer } from "ws";
+import userRouter from "../routes/user.route";
+import { UserMap, User } from "../types/User";
+import { Nodes, AllNodes } from "../types/websocket";
+import global from "../types/global";
 import { randomUUID } from "crypto";
-import { UserMap } from "../types/User";
 const app: Application = express();
 
 const PORT = process.env.PORT || 1726;
+
+const wss = new WebSocketServer({
+  port: 8080,
+});
 
 app.use(express.json());
 app.use(
@@ -14,37 +22,50 @@ app.use(
   })
 );
 
+// databases as mapping
 const userMapping: UserMap = {};
+const wsNodesMapping: AllNodes = {};
 
-app.get("/", (req, res) => {
-  let id = randomUUID();
+let uniqueId: string;
 
-  userMapping[id] = {
-    userId: id,
+// setting websocket connection
+wss.on("connection", (ws: Nodes) => {
+  console.log("Connected...");
+  uniqueId = randomUUID();
+
+  ws[uniqueId] = {
+    userId: uniqueId,
     joinedAt: new Date(),
+    connected: true,
   };
+  wsNodesMapping[uniqueId] = ws;
 
-  res.json({
-    msg: userMapping[id],
+  ws.send(JSON.stringify(ws[uniqueId]));
+
+  ws.on("message", (data) => {
+    const { from, to, msg } = JSON.parse(data);
+    console.log(wsNodesMapping[to][to]);
+    console.log(from, to, msg);
+    wsNodesMapping[to].send(
+      JSON.stringify({
+        from: from,
+        msg: msg,
+      })
+    );
+  });
+
+  ws.on("close", () => {
+    console.log("Left");
   });
 });
 
-app.post(
-  "/getuser",
-  (req: Request<any, any, { userId: string }>, res: Response) => {
-    const { userId } = req.body;
-    if (userMapping[userId]) {
-      console.log(userMapping[userId].joinedAt?.toLocaleString());
-      res.json({
-        msg: userMapping[userId],
-      });
-    } else {
-      res.json({
-        error: "No user exist",
-      });
-    }
-  }
-);
+app.use((req: Request, res: Response, next: NextFunction) => {
+  req.allusers = userMapping;
+  req.allconnectedNodes = wsNodesMapping;
+  next();
+});
+
+app.use("/v1", userRouter);
 
 app.listen(PORT, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);

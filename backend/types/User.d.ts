@@ -3,6 +3,7 @@ export interface User {
   name?: string;
   joinedAt?: string | Date;
   leaveAt?: string | Date;
+  connected?: boolean;
 }
 
 export type UserMap = {
