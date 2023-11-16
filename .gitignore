@@ -30,7 +30,13 @@ build/Release
 frontend/node_modules
 frontend/.next
 frontend/next-env.d.ts
+
+# backend
 backend/node_modules
+backend/.env
+backend/dist
+
+
 jspm_packages
 
 # Optional npm cache directory

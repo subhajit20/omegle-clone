@@ -6,7 +6,7 @@ function History() {
   return (
     <main className="min-h-screen py-5">
       <Heading
-        headingName={'Contact history'}
+        headingName={'Call history'}
         styles={"text-3xl text-center"}
        />
       <Contact contactName={"Subhajit"} btnIcon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-red-600">
