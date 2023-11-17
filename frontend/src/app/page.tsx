@@ -51,8 +51,8 @@ export default function Home() {
           }
         });
 
-      const sdpOffer = await createOfferForRemoteUser(streamInfo?.peer,stream);
-      console.log(sdpOffer);
+      await createOfferForRemoteUser(streamInfo?.peer,stream);
+      // console.log(sdpOffer);
       setLoading(false);
     }catch(e){
       console.log(e);
@@ -77,21 +77,26 @@ export default function Home() {
     }
   },[streamInfo])
 
-  useEffect(()=>{
-    console.log(streamInfo)
-  },[streamInfo])
+  // useEffect(()=>{
+  //   console.log(streamInfo)
+  // },[streamInfo])
+
+  // useEffect(()=>{
+  //   console.log(callInformation)
+  // },[callInformation])
 
   useEffect(()=>{
-    console.log(callInformation)
-  },[callInformation])
+    if(ws?.wss === null || ws?.wss === undefined){
+      initWebSocket('ws://localhost:8080');
+    }
+  },[])
 
   useEffect(()=>{
-    if(ws?.wss === null){
-      initWebSocket("ws://localhost:3000")
-    }else{
+    if(ws?.wss !== null || ws?.wss !== undefined){
+      console.log(ws?.connected)
       getOffer(ws?.wss);
     }
-  },[getOffer, initWebSocket, ws])
+  },[getOffer,ws?.wss])
 
   return (
     <main className="min-h-screen py-5">
@@ -110,7 +115,7 @@ export default function Home() {
         headingName={'My Contact'}
         styles={"text-3xl text-center"}
        />
-      <Badge status={ws?.wss.connected === true ? "success" : "error"} className="scale-[2]" />
+      <Badge status={ws?.connected === true ? "success" : "error"} className="scale-[2]" />
       </div>
       <Modal />
       <Contact contactName="Subhajit Ghosh" btnHandler={(e)=> Call(e)} />
