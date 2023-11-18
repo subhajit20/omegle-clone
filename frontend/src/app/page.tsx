@@ -7,7 +7,7 @@ import Modal from "@/components/ui/modal/Modal";
 import Heading from "@/components/ui/heading/Heading";
 import useVideoCall from "@/hooks/useVideoCall";
 import useWebSocket from "@/hooks/useWebSocket";
-import { Badge,Avatar } from "antd";
+import { Badge } from "antd";
 
 type StateType = {
   peer?:RTCPeerConnection,
@@ -16,23 +16,25 @@ type StateType = {
 export default function Home() {
   const [streamInfo,setStreamInfo] = React.useState<StateType>();
   const [loading,setLoading] = React.useState<boolean>(false);
+  
   const [
     showModal,
     handleOk,
     handleCancel,
     open,
    ] = Modal();
+
+   let hostname = "ws://localhost:8080";
    const {
     callInformation,
     createOfferForRemoteUser
    } = useVideoCall();
    const {
     ws,
-    initWebSocket,
-    getOffer
-   } = useWebSocket()
-
-  
+    user,
+    storeUserInfo,
+    setWs
+   } = useWebSocket(hostname);
 
   const Call = async (e:React.MouseEvent<HTMLElement>) =>{
     showModal()
@@ -77,30 +79,40 @@ export default function Home() {
     }
   },[streamInfo])
 
-  // useEffect(()=>{
-  //   console.log(streamInfo)
-  // },[streamInfo])
-
-  // useEffect(()=>{
-  //   console.log(callInformation)
-  // },[callInformation])
-
+  
   useEffect(()=>{
-    if(ws?.wss === null || ws?.wss === undefined){
-      initWebSocket('ws://localhost:8080');
-    }
-  },[])
+    if(ws?.wss){
+      const {wss} = ws;
 
-  useEffect(()=>{
-    if(ws?.wss !== null || ws?.wss !== undefined){
-      console.log(ws?.connected)
-      getOffer(ws?.wss);
+      wss.onmessage = (e) =>{
+        const data = JSON.parse(e.data);
+
+        if(data.user){
+          console.log(data.user)
+          storeUserInfo(data.user);
+        }
+      }
+
+      wss.onerror = (e) =>{
+        console.log(e)
+        setWs({
+          wss:null,
+          connected:false
+        })
+      }
     }
-  },[getOffer,ws?.wss])
+
+
+    return ()=>{
+      if(ws?.wss){
+        ws?.wss.close()
+      }
+    }
+  },[ws])
+
 
   return (
     <main className="min-h-screen py-5">
-      
       {
         streamInfo?.stream && !loading ? <ModalContainer 
         open={open} 
@@ -121,6 +133,9 @@ export default function Home() {
       <Contact contactName="Subhajit Ghosh" btnHandler={(e)=> Call(e)} />
       <Contact contactName="Badal Ghosh" btnHandler={(e)=> Call(e)} />
       <Contact contactName="Sujata Ghosh" btnHandler={(e)=> Call(e)} />
+      <button className='btn outline danger'>
+        Close
+      </button>
     </main>
   )
 }

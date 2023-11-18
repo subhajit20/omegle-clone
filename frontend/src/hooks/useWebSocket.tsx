@@ -1,81 +1,52 @@
-import React, { useState,useCallback } from 'react'
+'use client'
+
+import React, { useState,useCallback,useEffect } from 'react';
+import { UserInterface } from '@/types/user';
 
 type WssTypes = {
     wss?:WebSocket | null,
     incommingOffer?:RTCSessionDescription | null,
-    connected?:boolean
+    connected?:boolean,
 }
 
 type WebSocketHookType = {
     ws:WssTypes | null,
     connected:boolean,
-    initWebSocket:(hostName:string)=> void,
-    getOffer:(ws:WebSocket) => void,
-    closeConnection:(ws:WebSocket) => void
+    user:UserInterface | null,
+    storeUserInfo:(user:UserInterface) => void,
+    setWs:React.Dispatch<React.SetStateAction<WssTypes | null>>,
 }
 
-function useWebSocket():WebSocketHookType {
-    const [ws,setWs] = useState<WssTypes | null>(null);
+function useWebSocket(hostname:string ):WebSocketHookType {
+    const [ws,setWs] = useState<WssTypes | null>({
+        wss:null,
+        connected:false
+    });
     const [connected,setConnection] = useState<boolean>(false);
+    const [user,setUserInfo] = React.useState<UserInterface | null>(null);
 
-    const initWebSocket = useCallback((hostName:string):void =>{
-        try{
-            if(ws?.wss === null || ws?.wss === undefined){
-                const ws = new WebSocket(hostName);
-                setConnection(true);
-                setWs((prev)=>{
-                    return {
-                        ...prev,
-                        wss:ws,
-                        connected:true
-                    }
-                })
-            }
-        }catch(e){
-            console.log(e);
-            setConnection(false);
-            setWs((prev)=>{
-                    return {
-                        ...prev,
-                        wss:null,
-                        connected:false
-                    }
-                })
-        }
-    },[ws?.wss])
-
-    const getOffer = (ws:WebSocket):void =>{
-        try{
-            if(!ws){
-                throw "No connection"
-            }
-            ws!.onmessage = (e) =>{
-                console.log(JSON.parse(e.data));
-            }
-        }catch(e){
-            console.log(e)
-        }
+    const storeUserInfo = (user:UserInterface) =>{
+        setUserInfo({
+                userId:user.userId,
+                joinedAt:user.joinedAt,})
     }
 
-    const closeConnection = (ws:WebSocket) =>{
-        try{
-            if(!ws){
-                throw "No connection"
-            }
-            ws!.onclose = () =>{
-                setConnection(false);
-            }
-        }catch(e){
-            console.log(e)
+    useEffect(()=>{
+        if(ws?.wss === null && hostname){
+            const ws = new WebSocket(hostname);
+            setWs({
+                wss:ws,
+                connected:true
+            })
         }
-    }
+    },[hostname,ws?.wss])
 
   return {
     ws,
     connected,
-    initWebSocket,
-    getOffer,
-    closeConnection
+    user,
+    storeUserInfo,
+    setWs
   }
 }
 

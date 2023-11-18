@@ -24,23 +24,33 @@ app.use(
 
 // databases as mapping
 const userMapping: UserMap = {};
+const userList: User[] = [];
 const wsNodesMapping: AllNodes = {};
 
 let uniqueId: string;
 
 // setting websocket connection
+let connect = 0;
 wss.on("connection", (ws: Nodes) => {
   console.log("Connected...");
   uniqueId = randomUUID();
+  connect++;
+  console.log(connect);
 
   ws[uniqueId] = {
     userId: uniqueId,
     joinedAt: new Date(),
     connected: true,
   };
+
+  userList.push(ws[uniqueId]);
   wsNodesMapping[uniqueId] = ws;
 
-  ws.send(JSON.stringify(ws[uniqueId]));
+  ws.send(
+    JSON.stringify({
+      user: ws[uniqueId],
+    })
+  );
 
   ws.on("message", (data) => {
     const { from, to, msg } = JSON.parse(data);
