@@ -53,9 +53,16 @@ export default function Home() {
           }
         });
 
-      await createOfferForRemoteUser(streamInfo?.peer,stream);
+      const offer = await createOfferForRemoteUser(streamInfo?.peer,stream);
       // console.log(sdpOffer);
       setLoading(false);
+      ws?.wss?.send(JSON.stringify({
+        offer:{
+          from:user?.userId,
+          to:"s",
+          offer:offer
+        }
+      }))
     }catch(e){
       console.log(e);
       setLoading(false);
@@ -90,6 +97,8 @@ export default function Home() {
         if(data.user){
           console.log(data.user)
           storeUserInfo(data.user);
+        }else if(data.allConnections){
+          console.log(data.allConnections)
         }
       }
 
@@ -104,7 +113,12 @@ export default function Home() {
 
 
     return ()=>{
-      if(ws?.wss){
+      if(ws?.wss && user?.userId){
+        ws?.wss.send(JSON.stringify({
+          left:{
+            id:user?.userId
+          }
+        }))
         ws?.wss.close()
       }
     }
