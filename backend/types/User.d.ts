@@ -1,11 +1,3 @@
 export interface User {
-  userId: string;
-  name?: string;
-  joinedAt?: string | Date;
-  leaveAt?: string | Date;
-  connected?: boolean;
+  userId?: string;
 }
-
-export type UserMap = {
-  [userId: string]: User;
-};
