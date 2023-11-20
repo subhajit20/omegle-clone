@@ -6,6 +6,12 @@ export interface Nodes extends WebSocketServer {
   send?: any;
 }
 
+type TwoNode = [Nodes?, Nodes?];
+
+export interface Room {
+  [roomId: string]: TwoNode;
+}
+
 export type AllNodes = {
   [userId: string]: Nodes;
 };

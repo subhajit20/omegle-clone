@@ -93,7 +93,8 @@ export default function Home() {
 
       wss.onmessage = (e) =>{
         const data = JSON.parse(e.data);
-
+        console.log(data)
+        
         if(data.user){
           console.log(data.user)
           storeUserInfo(data.user);
