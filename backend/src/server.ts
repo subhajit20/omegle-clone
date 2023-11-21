@@ -37,6 +37,8 @@ let connect = 0;
 wss.on("connection", (ws: Nodes) => {
   uniqueId = randomUUID().substring(0, 8);
   roomId = randomUUID().substring(0, 8);
+  connect++;
+  console.log(connect);
   user = {
     userId: uniqueId,
   };
@@ -48,7 +50,7 @@ wss.on("connection", (ws: Nodes) => {
 
   userMapping[uniqueId] = ws;
 
-  console.log(randomInt(roomIds.length));
+  // console.log(randomInt(roomIds.length));
   console.log(roomIds);
 
   ws.send(
