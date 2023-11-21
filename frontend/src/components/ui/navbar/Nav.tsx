@@ -9,7 +9,7 @@ function Nav() {
             <a className="navbar-item">Video Calling App</a>
         </div>
         <div className="navbar-end">
-            <Link className="navbar-item" href={'/'}>Contacts</Link>
+            <Link className="navbar-item" href={'/'}>Home</Link>
             <Link className="navbar-item" href={'/history'}>History</Link>
         </div> 
     </div>

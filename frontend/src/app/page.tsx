@@ -3,6 +3,7 @@ import React,{useEffect} from "react";
 import { useAppDispatch,useAppSelector } from "@/store/hook";
 import {connect,disconnect} from '@/features/websockets/webSocketSlice';
 import { loadUser } from "@/features/websockets/userSlice";
+import Link from "next/link";
 
 type StateType = {
   peer?:RTCPeerConnection,
@@ -16,38 +17,38 @@ export default function Home() {
   const {WS,connected} = webSocketReducer;
   const {userId} = userReducer;
 
-  const Call = async (e:React.MouseEvent<HTMLElement>) =>{
-    showModal()
-    setLoading(true);
-    const conf = {
-      video:true,
-      audio:true
-    }
-    try{
-        const stream = await navigator.mediaDevices.getUserMedia(conf);
+  // const Call = async (e:React.MouseEvent<HTMLElement>) =>{
+  //   showModal()
+  //   setLoading(true);
+  //   const conf = {
+  //     video:true,
+  //     audio:true
+  //   }
+  //   try{
+  //       const stream = await navigator.mediaDevices.getUserMedia(conf);
 
-        setStreamInfo((prev)=>{
-          return {
-            ...prev,
-            stream:stream
-          }
-        });
+  //       setStreamInfo((prev)=>{
+  //         return {
+  //           ...prev,
+  //           stream:stream
+  //         }
+  //       });
 
-      const offer = await createOfferForRemoteUser(streamInfo?.peer,stream);
-      // console.log(sdpOffer);
-      setLoading(false);
-      ws?.wss?.send(JSON.stringify({
-        offer:{
-          from:user?.userId,
-          to:"s",
-          offer:offer
-        }
-      }))
-    }catch(e){
-      console.log(e);
-      setLoading(false);
-    }
-  }
+  //     const offer = await createOfferForRemoteUser(streamInfo?.peer,stream);
+  //     // console.log(sdpOffer);
+  //     setLoading(false);
+  //     ws?.wss?.send(JSON.stringify({
+  //       offer:{
+  //         from:user?.userId,
+  //         to:"s",
+  //         offer:offer
+  //       }
+  //     }))
+  //   }catch(e){
+  //     console.log(e);
+  //     setLoading(false);
+  //   }
+  // }
 
   useEffect(()=>{
     if(!streamInfo?.peer){
@@ -97,8 +98,19 @@ export default function Home() {
 
   return (
     <main className="min-h-screen py-5">
-      <p>{connected ? "Connected" : "Not Connected"}</p>
-      {userId}
+      <div className="flex justify-center items-center gap-x-4 min-h-[40rem]">
+        <Link href={'/text'}>
+          <button className='btn outline success w-[7rem] text-base'>
+          Text
+          </button>
+        </Link>
+        <span>or</span>
+        <Link href={"/videocall"}>
+          <button className='btn outline warn w-[8rem] text-base'>
+            Video Call
+          </button>
+        </Link>
+      </div>
     </main>
   )
 }
