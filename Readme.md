@@ -1,6 +1,6 @@
 # Omegle Clone
 
-![Logo](./Omegle%20Clone%20Front%20Page.png)
+![Logo](https://github.com/subhajit20/omegle-clone/blob/master/Omegle%20Clone%20Front%20Page.png)
 
 ## Getting Started
 
