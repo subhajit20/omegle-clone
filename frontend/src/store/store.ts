@@ -1,12 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import counterSlice from "@/features/websockets/counterSlice";
 import webSocketSlice from "@/features/websockets/webSocketSlice";
 import userSlice from "@/features/websockets/userSlice";
 // ...
 
 export const store = configureStore({
   reducer: {
-    counterReducer: counterSlice,
     webSocketReducer: webSocketSlice,
     userReducer: userSlice,
   },

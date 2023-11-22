@@ -2,7 +2,7 @@
 import React,{useEffect} from "react";
 import { useAppDispatch,useAppSelector } from "@/store/hook";
 import {connect,disconnect} from '@/features/websockets/webSocketSlice';
-import { loadUser } from "@/features/websockets/userSlice";
+import { loadUser,joinRoom } from "@/features/websockets/userSlice";
 import Link from "next/link";
 
 type StateType = {
@@ -50,6 +50,14 @@ export default function Home() {
   //   }
   // }
 
+  const joinRoom = () =>{
+    WS?.send(JSON.stringify({
+      join:{
+        userId:userId
+      }
+    }))
+  }
+
   useEffect(()=>{
     if(!streamInfo?.peer){
        const iceServers = [
@@ -86,6 +94,10 @@ export default function Home() {
           dispatch(loadUser({
             id:user
           }))
+        }else if(incommingData.roomInfo){
+          console.log(incommingData.roomInfo)
+          const {roomId} = incommingData.roomInfo;
+          console.log(roomId);
         }
       }
 
@@ -99,8 +111,8 @@ export default function Home() {
   return (
     <main className="min-h-screen py-5">
       <div className="flex justify-center items-center gap-x-4 min-h-[40rem]">
-        <Link href={'/text'}>
-          <button className='btn outline success w-[7rem] text-base'>
+        <Link href={'/text'} onClick={()=> joinRoom()} >
+          <button  className='btn outline success w-[7rem] text-base'>
           Text
           </button>
         </Link>
