@@ -1,6 +1,6 @@
 # Omegle Clone
 
-![Logo](https://github.com/subhajit20/omegle-clone/blob/master/Omegle-clone-thumbnail.png)
+![Omegle-clone-thumbnail](https://github.com/subhajit20/omegle-clone/assets/99127578/848bedfd-c8a4-4e6c-b96d-5a46811b5054)
 
 ## Getting Started
 
