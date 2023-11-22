@@ -2,7 +2,7 @@
 import React,{useEffect} from "react";
 import { useAppDispatch,useAppSelector } from "@/store/hook";
 import {connect,disconnect} from '@/features/websockets/webSocketSlice';
-import { loadUser,joinRoom } from "@/features/websockets/userSlice";
+import { loadUser,joinUserToRoom, leftRoom } from "@/features/websockets/userSlice";
 import Link from "next/link";
 
 type StateType = {
@@ -96,8 +96,11 @@ export default function Home() {
           }))
         }else if(incommingData.roomInfo){
           console.log(incommingData.roomInfo)
-          const {roomId} = incommingData.roomInfo;
-          console.log(roomId);
+          const {roomId,members} = incommingData.roomInfo;
+          dispatch(joinUserToRoom({
+            id:roomId,
+            members:[...members]
+          }))
         }
       }
 
