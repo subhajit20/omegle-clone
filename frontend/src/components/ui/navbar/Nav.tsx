@@ -6,7 +6,7 @@ function Nav() {
   return (
     <div className="navbar">
         <div className="navbar-start">
-            <a className="navbar-item">Video Calling App</a>
+            <a className="navbar-item">Omegle Clone</a>
         </div>
         <div className="navbar-end">
             <Link className="navbar-item" href={'/'}>Home</Link>

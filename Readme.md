@@ -1,5 +1,7 @@
 # Omegle Clone
 
+![Logo](./Omegle%20Clone%20Front%20Page.png)
+
 ## Getting Started
 
 Start Installation
