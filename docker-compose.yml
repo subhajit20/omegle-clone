@@ -1,0 +1,25 @@
+version: '1'
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/omegle-clone-frontend/src
+      - ./frontend/public:/omegle-clone-frontend/public
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - PORT:1726
+    volumes:
+      - ./backend/src:/omegle-clone-backend/src
+      - ./backend/controller:/omegle-clone-backend/controller
+      - ./backend/router:/omegle-clone-backend/route
+      - ./backend/types:/omegle-clone-backend/types
+    ports:
+      - "1726:1726"
+      - "8080:8080"

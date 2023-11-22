@@ -155,6 +155,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use("/v1", userRouter);
 
+app.get("/",(req:Request,res:Response)=>{
+  res.status(200).json({
+    msg:"Hello! I am omegle rest api :)"
+  })
+})
+
 app.listen(PORT, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);
 });
