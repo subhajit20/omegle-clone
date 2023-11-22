@@ -89,9 +89,9 @@ export default function Home() {
         }
       }
 
-      WS.onerror = (_e) =>{
-        dispatch(disconnect());
-      }
+      // WS.onerror = (_e) =>{
+      //   dispatch(disconnect());
+      // }
     }
   },[WS])
 
