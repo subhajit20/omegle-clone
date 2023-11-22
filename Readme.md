@@ -22,7 +22,7 @@ Go to the project directory
 [Mac](https://docs.docker.com/desktop/install/mac-install/)
 [ Windows ](https://docs.docker.com/desktop/install/windows-install/)
 
-```http
+```
   docker-compose up
 ```
 
