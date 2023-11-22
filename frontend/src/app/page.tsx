@@ -101,6 +101,8 @@ export default function Home() {
             id:roomId,
             members:[...members]
           }))
+        }else if(incommingData.message){
+          console.log(incommingData.message)
         }
       }
 

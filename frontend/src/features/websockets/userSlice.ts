@@ -35,10 +35,11 @@ const userSlice = createSlice({
     ) => {
       const { id, members } = action.payload;
       state.roomId = id;
-      state.roomMembers = [...state.roomMembers, ...members];
+      state.roomMembers = [...members];
     },
     leftRoom: (state) => {
       state.roomId = null;
+      state.roomMembers = [];
     },
   },
 });

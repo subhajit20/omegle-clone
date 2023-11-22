@@ -65,14 +65,8 @@ wss.on("connection", (ws: Nodes) => {
 
     if (data.join) {
       const { userId } = data.join;
-      const randomNumber = randomInt(roomIds.length);
-      const randomRoomId =
-        roomIds[
-          randomNumber > roomIds.length
-            ? randomNumber - roomIds.length
-            : randomNumber
-        ];
-      if (Rooms[randomRoomId] && Rooms[randomRoomId].length >= 2) {
+
+      if (roomIds.length <= 0) {
         roomId = randomUUID().substring(0, 8);
         Rooms[roomId] = [];
         Rooms[roomId][0] = userId;
@@ -85,7 +79,14 @@ wss.on("connection", (ws: Nodes) => {
           })
         );
       } else {
-        if (Rooms[randomRoomId].length < 1 && Rooms[randomRoomId].length > 2) {
+        const randomNumber = randomInt(roomIds.length);
+        const getRandomRoomId =
+          randomNumber > roomIds.length
+            ? randomNumber - roomIds.length
+            : randomNumber;
+
+        const randomRoomId = roomIds[getRandomRoomId];
+        if (Rooms[randomRoomId].length < 1 || Rooms[randomRoomId].length < 2) {
           Rooms[randomRoomId].push(userId);
 
           Rooms[randomRoomId].forEach((members) => {
@@ -100,20 +101,18 @@ wss.on("connection", (ws: Nodes) => {
               );
             }
           });
-        } else {
-          Rooms[randomRoomId].push(userId);
-          Rooms[randomRoomId].forEach((members) => {
-            if (members) {
-              userMapping[members].send(
-                JSON.stringify({
-                  roomInfo: {
-                    roomId: randomRoomId,
-                    members: Rooms[randomRoomId],
-                  },
-                })
-              );
-            }
-          });
+        } else if (Rooms[randomRoomId].length >= 2) {
+          roomId = randomUUID().substring(0, 8);
+          Rooms[roomId] = [];
+          Rooms[roomId][0] = userId;
+          userMapping[userId].send(
+            JSON.stringify({
+              roomInfo: {
+                roomId: roomId,
+                members: Rooms[roomId],
+              },
+            })
+          );
         }
       }
     } else if (data.sendMsg) {
@@ -121,10 +120,12 @@ wss.on("connection", (ws: Nodes) => {
       if (Rooms[roomId] && userMapping[from] && userMapping[to]) {
         userMapping[to].send(
           JSON.stringify({
-            roomId: roomId,
-            from: from,
-            to: to,
-            message: message,
+            message: {
+              roomId: roomId,
+              from: from,
+              to: to,
+              message: message,
+            },
           })
         );
       }
@@ -137,8 +138,10 @@ wss.on("connection", (ws: Nodes) => {
         let updatedRoom = roomIds.filter((rooms) => {
           return rooms !== roomId;
         });
-        console.log(updatedRoom);
+
+        console.log("Deleted Room --->", roomId);
         roomIds = [...updatedRoom];
+        console.log("Updated Rooms --->", updatedRoom);
       }
     }
   });
