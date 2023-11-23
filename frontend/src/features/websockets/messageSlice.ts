@@ -1,26 +1,22 @@
+import { RootState } from "@/store/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-enum messageType {
-  from = "from",
-  to = "to",
+export interface MesssageType {
+  type: string;
+  message: string;
 }
 
-type MessageTypes = {
-  [id: string]: string;
-};
-
 interface MessageInterface {
-  messages: MessageTypes[];
+  allMessages: MesssageType[];
 }
 
 interface MessagePayload {
-  from: string;
-  to: string;
+  type: string;
   message: string;
 }
 
 const messageState: MessageInterface = {
-  messages: [],
+  allMessages: [],
 };
 
 const messageSlice = createSlice({
@@ -28,12 +24,21 @@ const messageSlice = createSlice({
   initialState: messageState,
   reducers: {
     addMessages: (state, action: PayloadAction<MessagePayload>) => {
-      state.messages = [
-        ...state.messages,
+      state.allMessages = [
+        ...state.allMessages,
         {
-          [action.payload.from]: action.payload.message,
+          type: action.payload.type,
+          message: action.payload.message,
         },
       ];
     },
+    deleteAllMessage: (state) => {
+      state.allMessages = [];
+    },
   },
 });
+
+export const { addMessages, deleteAllMessage } = messageSlice.actions;
+export const selectMessage = (state: RootState) =>
+  state.messageReducer.allMessages;
+export default messageSlice.reducer;

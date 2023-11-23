@@ -123,7 +123,6 @@ wss.on("connection", (ws: Nodes) => {
             message: {
               roomId: roomId,
               from: from,
-              to: to,
               message: message,
             },
           })

@@ -3,16 +3,20 @@ import React, { useEffect,useState } from 'react'
 import Heading from '@/components/ui/heading/Heading';
 import { useAppSelector,useAppDispatch } from '@/store/hook';
 import { leftRoom } from '@/features/websockets/userSlice';
+import { addMessages,deleteAllMessage } from '@/features/websockets/messageSlice';
+import DisplayMessages from './DisplayMessages';
 
 const TextPage:React.FC = () => {
     const [message,setMessage] = useState<string>()
     const { userId,roomId,roomMembers } = useAppSelector((state)=> state.userReducer);
     const { WS } = useAppSelector((state)=> state.webSocketReducer);
+    const { allMessages } = useAppSelector((state)=> state.messageReducer);
     const dispatch = useAppDispatch()
 
     const leave = () =>{
         if(WS){
             dispatch(leftRoom());
+            dispatch(deleteAllMessage());
             WS.send(JSON.stringify({
                 left:{
                     roomId:roomId,
@@ -33,7 +37,7 @@ const TextPage:React.FC = () => {
     }
 
     const sendMessage = () =>{
-        if(WS){
+        if(WS && userId && message){
             WS?.send(JSON.stringify({
                 sendMsg:{
                     roomId:roomId,
@@ -42,23 +46,36 @@ const TextPage:React.FC = () => {
                     message:message
                 }
             }))
-
+            dispatch(addMessages({
+                type:"to",
+                message:message
+            }))
             setMessage('');
         }
     }
 
+
+    useEffect(()=>{
+        if(allMessages.length > 0){
+            console.log(allMessages)
+        }
+    },[allMessages])
+
   return (
-        <section>
-            <Heading 
+        <div className='relative h-full'>
+            <div className='mt-2'>
+                <Heading 
                 headingName={roomId ? `Room Id - ${roomId}` : ''}
                 styles={'text-center text-2xl'}
-            /> 
-            <Heading 
-                headingName={roomMembers.length === 0 ? "Disconnected" : roomMembers.length > 1 ? "Connected" : "Searching"}
-                styles={'text-center text-base'}
-            /> 
+                /> 
+                <Heading 
+                    headingName={roomMembers.length === 0 ? "Disconnected" : roomMembers.length > 1 ? `Connected with ${userId !== roomMembers[0] ? roomMembers[0] : roomMembers[1]}` : "Searching"}
+                    styles={'text-center text-base'}
+                /> 
+            </div>
+            <DisplayMessages allMessages={allMessages} />
             <div className='fixed bottom-0 flex justify-center gap-3 w-full mb-3'>
-                <input disabled={roomMembers.length === 0 || roomMembers.length < 2 ? true : false} className='input outline success max-w-[30rem] md:max-w-[60rem] bg-transparent text-slate-800 '
+                <input disabled={roomMembers.length === 0 || roomMembers.length < 2 ? true : false} className='input outline success max-w-[20rem] md:max-w-[60rem] bg-transparent text-slate-800 '
                 placeholder='Write Message'
                 value={message}
                 onChange={(e)=> setMessage(e.target.value)}
@@ -77,7 +94,7 @@ const TextPage:React.FC = () => {
                     Exit
                 </button>
             </div>
-        </section>
+        </div>
   )
 }
 

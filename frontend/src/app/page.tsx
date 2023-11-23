@@ -3,6 +3,7 @@ import React,{useEffect} from "react";
 import { useAppDispatch,useAppSelector } from "@/store/hook";
 import {connect,disconnect} from '@/features/websockets/webSocketSlice';
 import { loadUser,joinUserToRoom, leftRoom } from "@/features/websockets/userSlice";
+import { addMessages } from "@/features/websockets/messageSlice";
 import Link from "next/link";
 
 type StateType = {
@@ -102,13 +103,15 @@ export default function Home() {
             members:[...members]
           }))
         }else if(incommingData.message){
-          console.log(incommingData.message)
+          const {from,roomId,message} = incommingData.message;
+          console.log(from,message);
+          dispatch(addMessages({
+            type:"from",
+            message:message
+          }))
         }
       }
 
-      // WS.onerror = (_e) =>{
-      //   dispatch(disconnect());
-      // }
     }
   },[WS])
 

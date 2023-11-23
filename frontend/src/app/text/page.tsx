@@ -4,7 +4,7 @@ import TextPage from '@/components/pageComponents/TextPage';
 const page = () => {
 
   return (
-    <main className="min-h-[49.2rem] py-5 relative">
+    <main className="h-[38.2rem] md:h-[49.2rem]">
         <TextPage />
     </main>
   )
