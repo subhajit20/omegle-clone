@@ -8,6 +8,7 @@ import DisplayMessages from './DisplayMessages';
 import { notification } from 'antd';
 import type { NotificationPlacement } from 'antd/es/notification/interface';
 import { SmileOutlined } from '@ant-design/icons';
+import DotCircle from '../loader/DotCircle';
 
 const TextPage:React.FC = () => {
     const [message,setMessage] = useState<string>()
@@ -82,7 +83,7 @@ const TextPage:React.FC = () => {
                 styles={'text-center text-2xl'}
                 /> 
                 <Heading 
-                    headingName={roomMembers.length === 0 ? "Disconnected" : roomMembers.length > 1 ? `Connected with ${userId !== roomMembers[0] ? roomMembers[0] : roomMembers[1]}` : "Searching"}
+                    headingName={roomMembers.length === 0 ? "Disconnected" : roomMembers.length > 1 ? `Connected with ${userId !== roomMembers[0] ? roomMembers[0] : roomMembers[1]}` : <div className='w-full flex justify-center'><DotCircle /></div>}
                     styles={'text-center text-base'}
                 /> 
             </div>

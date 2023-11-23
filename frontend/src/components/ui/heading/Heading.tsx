@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 
 type HeadingProps = {
-    headingName?:string
+    headingName?:string | ReactElement
     styles?:string
 }
 
