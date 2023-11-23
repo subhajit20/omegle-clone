@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 .chatTextToColor {
     color:#19543E;
 }
