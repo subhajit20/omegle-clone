@@ -1,6 +1,6 @@
 # Omegle Clone
 
-![Omegle-clone-thumbnail](https://github.com/subhajit20/omegle-clone/assets/99127578/848bedfd-c8a4-4e6c-b96d-5a46811b5054)
+![Omegle Frontend](https://github.com/subhajit20/omegle-clone/assets/99127578/4a2a2def-4355-47fb-9c11-348c749bc168)
 
 ## Getting Started
 
