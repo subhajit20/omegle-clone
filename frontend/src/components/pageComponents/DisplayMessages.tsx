@@ -12,9 +12,10 @@ const DisplayMessages :React.FC<MessageProps> = (props: MessageProps) => {
         {
             props.allMessages.length > 0 ? props.allMessages.map((msg,i)=>{
                 if(msg.type === "from"){
-                    return <MessageCard key={i} message={msg.message} type={"warn outline"} styles={"flex justify-start my-2"} />
+                    return <MessageCard key={i} message={msg.message} type={"chatTextFromColor"} styles={"flex justify-start my-2"} />
                 }else if(msg.type === "to"){
-                    return <MessageCard key={i} message={msg.message} type={"success outline"} styles={"flex justify-end my-2"} />
+                    return <MessageCard key={i} message={msg.message} type={"chatTextToColor"} styles={"flex justify-end my-2"} />
+
                 }else{
                     return null
                 }
