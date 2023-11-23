@@ -5,13 +5,25 @@ import { useAppSelector,useAppDispatch } from '@/store/hook';
 import { leftRoom } from '@/features/websockets/userSlice';
 import { addMessages,deleteAllMessage } from '@/features/websockets/messageSlice';
 import DisplayMessages from './DisplayMessages';
+import { notification } from 'antd';
+import type { NotificationPlacement } from 'antd/es/notification/interface';
+import { SmileOutlined } from '@ant-design/icons';
 
 const TextPage:React.FC = () => {
     const [message,setMessage] = useState<string>()
     const { userId,roomId,roomMembers } = useAppSelector((state)=> state.userReducer);
     const { WS } = useAppSelector((state)=> state.webSocketReducer);
     const { allMessages } = useAppSelector((state)=> state.messageReducer);
-    const dispatch = useAppDispatch()
+     const [api, contextHolder] = notification.useNotification();
+    const dispatch = useAppDispatch();
+
+    const openNotification = (placement: NotificationPlacement) => {
+        api.info({
+        message: 'Someone just joined.Start convertation',
+        icon: <SmileOutlined style={{ color: '#108ee9' }} />,
+        placement:placement
+        });
+    };
 
     const leave = () =>{
         if(WS){
@@ -56,13 +68,14 @@ const TextPage:React.FC = () => {
 
 
     useEffect(()=>{
-        if(allMessages.length > 0){
-            console.log(allMessages)
+        if(roomMembers.length > 1){
+            openNotification("topRight");
         }
-    },[allMessages])
+    },[roomMembers])
 
   return (
         <div className='relative h-full'>
+            {contextHolder}
             <div className='mt-2'>
                 <Heading 
                 headingName={roomId ? `Room Id - ${roomId}` : ''}
