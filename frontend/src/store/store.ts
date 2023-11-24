@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import webSocketSlice from "@/features/websockets/webSocketSlice";
 import userSlice from "@/features/websockets/userSlice";
 import messageSlice from "@/features/websockets/messageSlice";
+import videoSlice from "@/features/websockets/videoStream";
 // ...
 
 export const store = configureStore({
@@ -9,6 +10,7 @@ export const store = configureStore({
     webSocketReducer: webSocketSlice,
     userReducer: userSlice,
     messageReducer: messageSlice,
+    videoReducer: videoSlice,
   },
 });
 
