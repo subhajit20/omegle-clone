@@ -3,7 +3,7 @@ import React, { useEffect,useState } from 'react'
 import Heading from '@/components/ui/heading/Heading';
 import { useAppSelector,useAppDispatch } from '@/store/hook';
 import { leftRoom } from '@/features/websockets/userSlice';
-import { addMessages,deleteAllMessage } from '@/features/websockets/messageSlice';
+import { addMessages,deleteAllMessage,leftMessage } from '@/features/websockets/messageSlice';
 import DisplayMessages from './DisplayMessages';
 import { notification } from 'antd';
 import type { NotificationPlacement } from 'antd/es/notification/interface';
@@ -14,13 +14,13 @@ const TextPage:React.FC = () => {
     const [message,setMessage] = useState<string>()
     const { userId,roomId,roomMembers } = useAppSelector((state)=> state.userReducer);
     const { WS } = useAppSelector((state)=> state.webSocketReducer);
-    const { allMessages } = useAppSelector((state)=> state.messageReducer);
-     const [api, contextHolder] = notification.useNotification();
+    const { allMessages,leftMsg } = useAppSelector((state)=> state.messageReducer);
+    const [api, contextHolder] = notification.useNotification();
     const dispatch = useAppDispatch();
 
-    const openNotification = (placement: NotificationPlacement) => {
+    const openNotification = (placement: NotificationPlacement,message?:string) => {
         api.info({
-        message: 'Someone just joined.Start convertation',
+        message:message || 'Someone just joined.Start convertation',
         icon: <SmileOutlined style={{ color: '#108ee9' }} />,
         placement:placement
         });
@@ -28,13 +28,18 @@ const TextPage:React.FC = () => {
 
     const leave = () =>{
         if(WS){
-            dispatch(leftRoom());
-            dispatch(deleteAllMessage());
             WS.send(JSON.stringify({
                 left:{
                     roomId:roomId,
-                    userId:userId
+                    leftUser:userId,
+                    roomMembers:roomMembers
                 }
+            }))
+            dispatch(leftRoom());
+            dispatch(deleteAllMessage());
+            dispatch(leftMessage({
+                type:"join",
+                message:"null"
             }))
         }
     }
@@ -73,6 +78,12 @@ const TextPage:React.FC = () => {
             openNotification("topRight");
         }
     },[roomMembers])
+
+    useEffect(()=>{
+        if(leftMsg !== null){
+            openNotification("topRight",leftMsg)
+        }
+    },[leftMsg])
 
   return (
         <div className='relative h-full'>

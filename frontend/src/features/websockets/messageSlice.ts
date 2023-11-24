@@ -8,6 +8,7 @@ export interface MesssageType {
 
 interface MessageInterface {
   allMessages: MesssageType[];
+  leftMsg: string | null;
 }
 
 interface MessagePayload {
@@ -17,6 +18,7 @@ interface MessagePayload {
 
 const messageState: MessageInterface = {
   allMessages: [],
+  leftMsg: null,
 };
 
 const messageSlice = createSlice({
@@ -35,10 +37,19 @@ const messageSlice = createSlice({
     deleteAllMessage: (state) => {
       state.allMessages = [];
     },
+    leftMessage: (state, action: PayloadAction<MessagePayload>) => {
+      state.allMessages = [];
+      if (action.payload.type === "leave") {
+        state.leftMsg = action.payload.message;
+      } else if (action.payload.type === "join") {
+        state.leftMsg = null;
+      }
+    },
   },
 });
 
-export const { addMessages, deleteAllMessage } = messageSlice.actions;
+export const { addMessages, deleteAllMessage, leftMessage } =
+  messageSlice.actions;
 export const selectMessage = (state: RootState) =>
   state.messageReducer.allMessages;
 export default messageSlice.reducer;

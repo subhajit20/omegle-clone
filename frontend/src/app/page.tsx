@@ -3,7 +3,7 @@ import React,{useEffect} from "react";
 import { useAppDispatch,useAppSelector } from "@/store/hook";
 import {connect,disconnect} from '@/features/websockets/webSocketSlice';
 import { loadUser,joinUserToRoom, leftRoom } from "@/features/websockets/userSlice";
-import { addMessages } from "@/features/websockets/messageSlice";
+import { addMessages,deleteAllMessage,leftMessage } from "@/features/websockets/messageSlice";
 import Link from "next/link";
 
 type StateType = {
@@ -12,7 +12,6 @@ type StateType = {
 }
 export default function Home() {
   const [streamInfo,setStreamInfo] = React.useState<StateType>();
-  const [loading,setLoading] = React.useState<boolean>(false);
   const {webSocketReducer,userReducer} = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const {WS,connected} = webSocketReducer;
@@ -51,12 +50,17 @@ export default function Home() {
   //   }
   // }
 
+
   const joinRoom = () =>{
     WS?.send(JSON.stringify({
       join:{
         userId:userId
       }
     }))
+    dispatch(leftMessage({
+        type:"join",
+        message:"null"
+      }))
   }
 
   useEffect(()=>{
@@ -108,6 +112,14 @@ export default function Home() {
           dispatch(addMessages({
             type:"from",
             message:message
+          }))
+        }else if(incommingData.leave){
+          console.log(incommingData.leave)
+          dispatch(leftRoom());
+          dispatch(deleteAllMessage());
+          dispatch(leftMessage({
+            type:"leave",
+            message:incommingData.leave
           }))
         }
       }

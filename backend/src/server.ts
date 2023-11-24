@@ -129,9 +129,10 @@ wss.on("connection", (ws: Nodes) => {
         );
       }
     } else if (data.left) {
-      const { roomId, userId } = data.left;
+      const { roomId, leftUser, roomMembers } = data.left;
+      console.log(roomMembers);
 
-      if (Rooms[roomId] && userMapping[userId]) {
+      if (Rooms[roomId] && userMapping[leftUser]) {
         delete Rooms[roomId];
 
         let updatedRoom = roomIds.filter((rooms) => {
@@ -141,6 +142,17 @@ wss.on("connection", (ws: Nodes) => {
         console.log("Deleted Room --->", roomId);
         roomIds = [...updatedRoom];
         console.log("Updated Rooms --->", updatedRoom);
+
+        // message sent to the present user
+        roomMembers.forEach((m: string) => {
+          if (m !== leftUser) {
+            userMapping[m].send(
+              JSON.stringify({
+                leave: `${leftUser} has left`,
+              })
+            );
+          }
+        });
       }
     }
   });
