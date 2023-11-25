@@ -68,6 +68,7 @@ wss.on("connection", (ws: Nodes) => {
 
       if (roomIds.length <= 0) {
         roomId = randomUUID().substring(0, 8);
+        Rooms[randomUUID().substring(0, 8)] = [];
         Rooms[roomId] = [];
         Rooms[roomId][0] = userId;
         userMapping[userId].send(
