@@ -6,7 +6,9 @@ function Nav() {
 	return (
 		<div className="navbar">
 			<div className="navbar-start">
-				<a className="navbar-item">Omegle Clone</a>
+				<Link className="navbar-item" href={"/"}>
+					Omegle Clone
+				</Link>
 			</div>
 			<div className="navbar-end">
 				<Link className="navbar-item" href={"/"}>
