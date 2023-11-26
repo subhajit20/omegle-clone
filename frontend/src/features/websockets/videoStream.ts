@@ -3,6 +3,7 @@ import { RootState } from "@/store/store";
 
 interface VideoInterface {
   stream: MediaStream | null;
+  peer: RTCPeerConnection | null;
 }
 
 interface PayloadInterface {
@@ -11,12 +12,16 @@ interface PayloadInterface {
 
 let VideoState: VideoInterface = {
   stream: null,
+  peer: null,
 };
 
 const videoSlice = createSlice({
   name: "video",
   initialState: VideoState,
   reducers: {
+    addPeer: (state, action) => {
+      state.peer = action.payload.peer;
+    },
     addStream: (state, action: PayloadAction<PayloadInterface>) => {
       state.stream = action.payload.stream;
     },
@@ -26,6 +31,6 @@ const videoSlice = createSlice({
   },
 });
 
-export const { addStream } = videoSlice.actions;
-export const selectVideoStream = (state: RootState) => state.videoReducer;
+export const { addPeer, addStream, removeStream } = videoSlice.actions;
+// export const selectVideoStream = (state: RootState) => state.videoReducer;
 export default videoSlice.reducer;

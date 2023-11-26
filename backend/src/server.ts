@@ -64,7 +64,7 @@ wss.on("connection", (ws: Nodes) => {
     console.log(data);
 
     if (data.join) {
-      const { userId } = data.join;
+      const { userId, type } = data.join;
 
       if (roomIds.length <= 0) {
         roomId = randomUUID().substring(0, 8);
@@ -76,6 +76,7 @@ wss.on("connection", (ws: Nodes) => {
             roomInfo: {
               roomId: roomId,
               members: Rooms[roomId],
+              option: type === "videoCall" ? "joined" : "",
             },
           })
         );
@@ -88,20 +89,35 @@ wss.on("connection", (ws: Nodes) => {
 
         const randomRoomId = roomIds[getRandomRoomId];
         if (Rooms[randomRoomId].length < 1 || Rooms[randomRoomId].length < 2) {
-          Rooms[randomRoomId].push(userId);
-
-          Rooms[randomRoomId].forEach((members) => {
-            if (members) {
-              userMapping[members].send(
-                JSON.stringify({
-                  roomInfo: {
-                    roomId: randomRoomId,
-                    members: Rooms[randomRoomId],
-                  },
-                })
-              );
-            }
-          });
+          if (Rooms[randomRoomId].length < 1) {
+            // you are the first member of this room
+            Rooms[randomRoomId][0] = userId;
+            userMapping[userId].send(
+              JSON.stringify({
+                roomInfo: {
+                  roomId: randomRoomId,
+                  members: Rooms[randomRoomId],
+                  option: type === "videoCall" ? "joined" : "",
+                },
+              })
+            );
+          } else if (Rooms[randomRoomId].length >= 1) {
+            // you are the last member of this room
+            Rooms[randomRoomId][1] = userId;
+            Rooms[randomRoomId].forEach((members) => {
+              if (members) {
+                userMapping[members].send(
+                  JSON.stringify({
+                    roomInfo: {
+                      roomId: randomRoomId,
+                      members: Rooms[randomRoomId],
+                      option: type === "videoCall" ? "joined" : "",
+                    },
+                  })
+                );
+              }
+            });
+          }
         } else if (Rooms[randomRoomId].length >= 2) {
           roomId = randomUUID().substring(0, 8);
           Rooms[roomId] = [];
@@ -111,6 +127,7 @@ wss.on("connection", (ws: Nodes) => {
               roomInfo: {
                 roomId: roomId,
                 members: Rooms[roomId],
+                option: type === "videoCall" ? "joined" : "",
               },
             })
           );
@@ -153,6 +170,30 @@ wss.on("connection", (ws: Nodes) => {
               })
             );
           }
+        });
+      }
+    } else if (data.openVideo) {
+      const { type, info, caller, receiver } = data.openVideo;
+
+      if (type === "offer" && userMapping[caller] && userMapping[receiver]) {
+        userMapping[receiver].send(
+          JSON.stringify({
+            calling: {
+              from: caller,
+              offer: info,
+            },
+          })
+        );
+      } else if (
+        type === "answer" &&
+        userMapping[caller] &&
+        userMapping[receiver]
+      ) {
+        userMapping[caller].send({
+          accepted: {
+            from: receiver,
+            answer: info,
+          },
         });
       }
     }

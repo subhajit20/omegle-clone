@@ -4,6 +4,8 @@ import { useAppDispatch,useAppSelector } from "@/store/hook";
 import {connect,disconnect} from '@/features/websockets/webSocketSlice';
 import { loadUser,joinUserToRoom, leftRoom } from "@/features/websockets/userSlice";
 import { addMessages,deleteAllMessage,leftMessage } from "@/features/websockets/messageSlice";
+import {addPeer} from "@/features/websockets/videoStream";
+import useWebSocket from "@/hooks/useWebSocket";
 import Link from "next/link";
 
 type StateType = {
@@ -12,56 +14,39 @@ type StateType = {
 }
 export default function Home() {
   const [streamInfo,setStreamInfo] = React.useState<StateType>();
-  const {webSocketReducer,userReducer} = useAppSelector((state) => state);
+  const {joinMessageChatRoom,joinVideoCallChatRoom} = useWebSocket()
+  const {webSocketReducer,userReducer,videoReducer} = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const {WS,connected} = webSocketReducer;
-  const {userId} = userReducer;
+  const {peer} = videoReducer;
+  const {userId,roomMembers} = userReducer;
 
   // const Call = async (e:React.MouseEvent<HTMLElement>) =>{
-  //   showModal()
-  //   setLoading(true);
   //   const conf = {
   //     video:true,
   //     audio:true
   //   }
   //   try{
-  //       const stream = await navigator.mediaDevices.getUserMedia(conf);
-
-  //       setStreamInfo((prev)=>{
-  //         return {
-  //           ...prev,
-  //           stream:stream
-  //         }
-  //       });
+  //     const stream = await navigator.mediaDevices.getUserMedia(conf);
 
   //     const offer = await createOfferForRemoteUser(streamInfo?.peer,stream);
-  //     // console.log(sdpOffer);
-  //     setLoading(false);
-  //     ws?.wss?.send(JSON.stringify({
-  //       offer:{
-  //         from:user?.userId,
-  //         to:"s",
-  //         offer:offer
-  //       }
-  //     }))
+      
   //   }catch(e){
   //     console.log(e);
-  //     setLoading(false);
   //   }
   // }
-
-
-  const joinRoom = () =>{
-    WS?.send(JSON.stringify({
-      join:{
-        userId:userId
-      }
-    }))
-    dispatch(leftMessage({
-        type:"join",
-        message:"null"
-      }))
-  }
+  // const joinMessageChatRoom = () =>{
+  //   WS?.send(JSON.stringify({
+  //     join:{
+  //       userId:userId,
+  //       type:"text"
+  //     }
+  //   }))
+  //   dispatch(leftMessage({
+  //       type:"join",
+  //       message:"null"
+  //     }))
+  // }
 
   useEffect(()=>{
     if(!streamInfo?.peer){
@@ -89,6 +74,15 @@ export default function Home() {
   },[])
 
   useEffect(()=>{
+    if(peer === null){
+      let newPeer = new RTCPeerConnection();
+      dispatch(addPeer({
+        peer:newPeer
+      }))
+    }
+  },[peer])
+
+  useEffect(()=>{
     if(WS){
       WS.onmessage = (e) =>{
         const incommingData = JSON.parse(e.data);
@@ -101,11 +95,22 @@ export default function Home() {
           }))
         }else if(incommingData.roomInfo){
           console.log(incommingData.roomInfo)
-          const {roomId,members} = incommingData.roomInfo;
+          const {roomId,members,option} = incommingData.roomInfo;
           dispatch(joinUserToRoom({
             id:roomId,
             members:[...members]
           }))
+
+          if(option !== "" && option === 'connected' && userId === members[0]){
+            WS.send(JSON.stringify({
+              openVideo:{
+                type:"offer",
+                info:"Offerrrrrrrr",
+                caller:userId,
+                receiver:members[1]
+              }
+            }))
+          }
         }else if(incommingData.message){
           const {from,roomId,message} = incommingData.message;
           console.log(from,message);
@@ -121,6 +126,17 @@ export default function Home() {
             type:"leave",
             message:incommingData.leave
           }))
+        }else if(incommingData.calling){
+          if(userId === roomMembers[1]){
+            WS.send(JSON.stringify({
+                type:"answer",
+                info:"Offerrrrrrrr",
+                receiver:userId,
+                caller:roomMembers[0]
+            }))
+          }
+        }else if(incommingData.accepted){
+          console.log("Accepted .....")
         }
       }
 
@@ -131,13 +147,13 @@ export default function Home() {
   return (
     <main className="min-h-screen py-5">
       <div className="flex justify-center items-center gap-x-4 min-h-[40rem]">
-        <Link href={'/text'} onClick={()=> joinRoom()} >
+        <Link href={'/text'} onClick={()=> joinMessageChatRoom(WS!,userId!)} >
           <button  className='btn outline success w-[7rem] text-base'>
           Text
           </button>
         </Link>
         <span>or</span>
-        <Link href={"/videocall"}>
+        <Link href={"/videocall"} onClick={()=> joinVideoCallChatRoom(WS!,userId!)}>
           <button className='btn outline warn w-[8rem] text-base'>
             Video Call
           </button>

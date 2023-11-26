@@ -1,53 +1,62 @@
 'use client'
-
-import React, { useState,useCallback,useEffect } from 'react';
+import React from 'react';
 import { UserInterface } from '@/types/user';
+import { useAppDispatch } from '@/store/hook';
+import { leftMessage } from '@/features/websockets/messageSlice';
 
-type WssTypes = {
-    wss?:WebSocket | null,
-    incommingOffer?:RTCSessionDescription | null,
-    connected?:boolean,
-}
+// type WssTypes = {
+//     wss?:WebSocket | null,
+//     incommingOffer?:RTCSessionDescription | null,
+//     connected?:boolean,
+// }
 
 type WebSocketHookType = {
-    ws:WssTypes | null,
-    connected:boolean,
-    user:UserInterface | null,
-    storeUserInfo:(user:UserInterface) => void,
-    setWs:React.Dispatch<React.SetStateAction<WssTypes | null>>,
+    joinMessageChatRoom:(WS:WebSocket,userId:string) => void,
+    joinVideoCallChatRoom:(WS:WebSocket,userId:string) => void
 }
 
-function useWebSocket(hostname:string ):WebSocketHookType {
-    const [ws,setWs] = useState<WssTypes | null>({
-        wss:null,
-        connected:false
-    });
-    const [connected,setConnection] = useState<boolean>(false);
-    const [user,setUserInfo] = React.useState<UserInterface | null>(null);
+function useWebSocket():WebSocketHookType {
+    const dispatch = useAppDispatch();
 
-    const storeUserInfo = (user:UserInterface) =>{
-        setUserInfo({
-                userId:user.userId,
-                joinedAt:user.joinedAt,})
+
+    const joinMessageChatRoom = (WS:WebSocket,userId:string) =>{
+        try{
+            WS.send(JSON.stringify({
+            join:{
+                userId:userId,
+                type:"text"
+            }
+            }))
+            dispatch(leftMessage({
+                type:"join",
+                message:"null"
+            }))
+        }catch(e){
+            console.log(e)
+        }
     }
 
-    useEffect(()=>{
-        if(ws?.wss === null && hostname){
-            const ws = new WebSocket(hostname);
-            setWs({
-                wss:ws,
-                connected:true
-            })
+    const joinVideoCallChatRoom = (WS:WebSocket,userId:string) =>{
+        try{
+            WS.send(JSON.stringify({
+            join:{
+                    userId:userId,
+                    type:"videoCall"
+                }
+            }))
+            dispatch(leftMessage({
+                type:"join",
+                message:"null"
+            }))
+        }catch(e){
+            console.log(e)
         }
-    },[hostname,ws?.wss])
+    }
 
-  return {
-    ws,
-    connected,
-    user,
-    storeUserInfo,
-    setWs
-  }
+    return {
+        joinMessageChatRoom:joinMessageChatRoom,
+        joinVideoCallChatRoom:joinVideoCallChatRoom
+    }
 }
 
 export default useWebSocket
