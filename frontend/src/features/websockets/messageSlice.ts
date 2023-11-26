@@ -50,6 +50,5 @@ const messageSlice = createSlice({
 
 export const { addMessages, deleteAllMessage, leftMessage } =
   messageSlice.actions;
-export const selectMessage = (state: RootState) =>
-  state.messageReducer.allMessages;
+export const selectMessage = (state: RootState) => state.messageReducer;
 export default messageSlice.reducer;

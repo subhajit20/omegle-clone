@@ -20,10 +20,12 @@ const videoSlice = createSlice({
     addStream: (state, action: PayloadAction<PayloadInterface>) => {
       state.stream = action.payload.stream;
     },
+    removeStream: (state) => {
+      state.stream = null;
+    },
   },
 });
 
 export const { addStream } = videoSlice.actions;
-export const selectVideoStream = (state: RootState) =>
-  state.videoReducer.stream;
+export const selectVideoStream = (state: RootState) => state.videoReducer;
 export default videoSlice.reducer;

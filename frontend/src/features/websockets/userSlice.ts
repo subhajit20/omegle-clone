@@ -45,5 +45,5 @@ const userSlice = createSlice({
 });
 
 export const { loadUser, joinUserToRoom, leftRoom } = userSlice.actions;
-export const selectUser = (state: RootState) => state.userReducer.userId;
+export const selectUser = (state: RootState) => state.userReducer;
 export default userSlice.reducer;

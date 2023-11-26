@@ -22,7 +22,7 @@ const Frame = (props: Props) => {
         camOn()
     },[])
   return (
-    <div className='flex flex-col gap-y-5 pl-2 pt-2'>
+    <div className='flex flex-col gap-y-5 pl-2 pt-2 bg-green-400'>
         {/* Remote Frame */}
         <div className="w-56 rounded-md h-36 p-2">
             <video src="" ref={ref1} id="localVideo" width="600" height="300" className="object-fit-cover rounded-lg" autoPlay playsInline></video>
