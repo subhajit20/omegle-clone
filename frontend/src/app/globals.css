@@ -3,9 +3,11 @@
 @tailwind utilities;
 
 .chatTextToColor {
-    color:#19543E;
+    color:#52A56A;
+    font-weight: bold;
 }
 
 .chatTextFromColor {
-    color:#91620b;
+    color:#F06612;
+    font-weight: bold;
 }

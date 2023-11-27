@@ -1,17 +1,18 @@
 import React from 'react'
+import { DisplayMessage } from '../../../types/Message';
 
 type Props = {
     message:string
-    styles?:string
-    type?:string
+    styles:DisplayMessage
 }
 
 const MessageCard = (props: Props) => {
+    const { type, alignmentStyle, messageColor } = props.styles;
   return (
-            <div className={`${props.styles}`}>
-                <div className={`prompt ${props.type} max-w-sm relative`} >
+            <div className={`${alignmentStyle}`}>
+                <div className={`prompt ${type} max-w-sm relative`} >
                     <div className='content'>
-                        <p>
+                        <p className={messageColor}>
                             {props.message}
                         </p>
                     </div>
