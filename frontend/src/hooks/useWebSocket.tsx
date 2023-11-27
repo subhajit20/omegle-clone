@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { useCallback } from 'react';
 import { UserInterface } from '@/types/user';
 import { useAppDispatch } from '@/store/hook';
 import { leftMessage } from '@/features/websockets/messageSlice';
@@ -12,14 +12,15 @@ import { leftMessage } from '@/features/websockets/messageSlice';
 
 type WebSocketHookType = {
     joinMessageChatRoom:(WS:WebSocket,userId:string) => void,
-    joinVideoCallChatRoom:(WS:WebSocket,userId:string) => void
+    joinVideoCallChatRoom:(WS:WebSocket,userId:string) => void,
+    placeCall:(WS:WebSocket,peer:RTCPeerConnection,localStream:MediaStream,userId:string,receiver:string) => void;
+    receiveCall:(WS:WebSocket,peer:RTCPeerConnection,localStream:MediaStream,offer:RTCSessionDescriptionInit,caller:string,receiver:string) => void
 }
 
 function useWebSocket():WebSocketHookType {
     const dispatch = useAppDispatch();
 
-
-    const joinMessageChatRoom = (WS:WebSocket,userId:string) =>{
+    const joinMessageChatRoom = useCallback((WS:WebSocket,userId:string) =>{
         try{
             WS.send(JSON.stringify({
             join:{
@@ -34,9 +35,9 @@ function useWebSocket():WebSocketHookType {
         }catch(e){
             console.log(e)
         }
-    }
+    },[dispatch])
 
-    const joinVideoCallChatRoom = (WS:WebSocket,userId:string) =>{
+    const joinVideoCallChatRoom = useCallback((WS:WebSocket,userId:string) =>{
         try{
             WS.send(JSON.stringify({
             join:{
@@ -51,11 +52,58 @@ function useWebSocket():WebSocketHookType {
         }catch(e){
             console.log(e)
         }
-    }
+    },[dispatch])
+
+    const placeCall = useCallback(async(WS:WebSocket,peer:RTCPeerConnection,localStream:MediaStream,userId:string,receiver:string) =>{
+        try{
+            localStream.getTracks().forEach((track)=>{
+                peer.addTrack(track,localStream);
+            });
+
+            const offer = await peer.createOffer();
+            await peer.setLocalDescription(offer);
+            const sdpOffer = peer.localDescription;
+
+            WS.send(JSON.stringify({
+                openVideo:{
+                    type:"offer",
+                    info:sdpOffer,
+                    caller:userId,
+                    receiver:receiver
+                }
+            }))
+        }catch(e){
+            console.log(e)
+        }   
+    },[])
+
+    const receiveCall = useCallback(async(WS:WebSocket,peer:RTCPeerConnection,localStream:MediaStream,offer:RTCSessionDescriptionInit,caller:string,receiver:string) =>{
+        try{
+            localStream.getTracks().forEach((track)=>{
+                peer.addTrack(track,localStream);
+            })
+            await peer.setRemoteDescription(new RTCSessionDescription(offer));
+            const answer = await peer.createAnswer();
+            await peer.setLocalDescription(answer)
+
+            WS.send(JSON.stringify({
+                openVideo:{
+                    type:"answer",
+                    info:answer,
+                    receiver:caller,
+                    caller:receiver
+                }
+            }))
+        }catch(e){
+            console.log(e)
+        }   
+    },[])
 
     return {
         joinMessageChatRoom:joinMessageChatRoom,
-        joinVideoCallChatRoom:joinVideoCallChatRoom
+        joinVideoCallChatRoom:joinVideoCallChatRoom,
+        placeCall:placeCall,
+        receiveCall:receiveCall
     }
 }
 

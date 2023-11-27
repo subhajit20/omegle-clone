@@ -48,7 +48,7 @@ const TextPage:React.FC = () => {
         if(WS){
             WS?.send(JSON.stringify({
                 join:{
-                    userId:userId
+                    userId:userId,
                 }
             }))
         }

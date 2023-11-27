@@ -14,11 +14,11 @@ type StateType = {
 }
 export default function Home() {
   const [streamInfo,setStreamInfo] = React.useState<StateType>();
-  const {joinMessageChatRoom,joinVideoCallChatRoom} = useWebSocket()
+  const {joinMessageChatRoom,joinVideoCallChatRoom,placeCall} = useWebSocket()
   const {webSocketReducer,userReducer,videoReducer} = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const {WS,connected} = webSocketReducer;
-  const {peer} = videoReducer;
+  const {peer,stream} = videoReducer;
   const {userId,roomMembers} = userReducer;
 
   // const Call = async (e:React.MouseEvent<HTMLElement>) =>{
@@ -49,23 +49,6 @@ export default function Home() {
   // }
 
   useEffect(()=>{
-    if(!streamInfo?.peer){
-       const iceServers = [
-           { urls: 'stun:stun.l.google.com:19302' },
-       ];
-      const configuration = { iceServers };
-
-      const peer = new RTCPeerConnection(configuration);
-       setStreamInfo((prev)=>{
-        return {
-          ...prev,
-          peer:peer
-        }
-      });
-    }
-  },[])
-
-  useEffect(()=>{
     if(!WS){
       dispatch(connect({
         port:"8080"
@@ -75,7 +58,11 @@ export default function Home() {
 
   useEffect(()=>{
     if(peer === null){
-      let newPeer = new RTCPeerConnection();
+      const iceServers = [
+           { urls: 'stun:stun.l.google.com:19302' },
+       ];
+      const configuration = { iceServers };
+      let newPeer = new RTCPeerConnection(configuration);
       dispatch(addPeer({
         peer:newPeer
       }))
@@ -101,15 +88,16 @@ export default function Home() {
             members:[...members]
           }))
 
-          if(option !== "" && option === 'connected' && userId === members[0]){
-            WS.send(JSON.stringify({
-              openVideo:{
-                type:"offer",
-                info:"Offerrrrrrrr",
-                caller:userId,
-                receiver:members[1]
-              }
-            }))
+          if(option === 'connected' && roomMembers.length > 0 && members.length > 0){
+            console.log(userId)
+            let caller = userId === members[0] ? userId : members[1];
+            let receiver = userId !== members[0] ? members[0] : members[1];
+            console.log(caller);
+            console.log(receiver);
+            console.log(roomMembers);
+            if(WS && peer && stream && userId){
+              placeCall(WS,peer,stream,caller,receiver);
+            }
           }
         }else if(incommingData.message){
           const {from,roomId,message} = incommingData.message;
@@ -141,7 +129,7 @@ export default function Home() {
       }
 
     }
-  },[WS])
+  },[WS,dispatch, roomMembers, userId])
 
 
   return (

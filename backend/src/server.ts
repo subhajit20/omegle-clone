@@ -104,23 +104,31 @@ wss.on("connection", (ws: Nodes) => {
           } else if (Rooms[randomRoomId].length >= 1) {
             // you are the last member of this room
             Rooms[randomRoomId][1] = userId;
-            Rooms[randomRoomId].forEach((members) => {
-              if (members) {
-                userMapping[members].send(
-                  JSON.stringify({
-                    roomInfo: {
-                      roomId: randomRoomId,
-                      members: Rooms[randomRoomId],
-                      option: type === "videoCall" ? "joined" : "",
-                    },
-                  })
-                );
-              }
-            });
+            userMapping[Rooms[randomRoomId][1]!].send(
+              JSON.stringify({
+                roomInfo: {
+                  roomId: randomRoomId,
+                  members: Rooms[randomRoomId],
+                  option: type === "videoCall" ? "joined" : "",
+                },
+              })
+            );
+
+            // if 1st member has a place then
+            userMapping[Rooms[randomRoomId][0]!].send(
+              JSON.stringify({
+                roomInfo: {
+                  roomId: randomRoomId,
+                  members: Rooms[randomRoomId],
+                  option: type === "videoCall" ? "connected" : "",
+                },
+              })
+            );
           }
         } else if (Rooms[randomRoomId].length >= 2) {
           roomId = randomUUID().substring(0, 8);
           Rooms[roomId] = [];
+          Rooms[randomUUID().substring(0, 8)] = [];
           Rooms[roomId][0] = userId;
           userMapping[userId].send(
             JSON.stringify({
@@ -174,7 +182,8 @@ wss.on("connection", (ws: Nodes) => {
       }
     } else if (data.openVideo) {
       const { type, info, caller, receiver } = data.openVideo;
-
+      console.log(type);
+      console.log(caller);
       if (type === "offer" && userMapping[caller] && userMapping[receiver]) {
         userMapping[receiver].send(
           JSON.stringify({
