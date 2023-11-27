@@ -159,15 +159,12 @@ wss.on("connection", (ws: Nodes) => {
       console.log(roomMembers);
 
       if (Rooms[roomId] && userMapping[leftUser]) {
-        delete Rooms[roomId];
-
-        let updatedRoom = roomIds.filter((rooms) => {
-          return rooms !== roomId;
-        });
+        // removeing users from the room
+        Rooms[roomId].pop();
+        Rooms[roomId].pop();
 
         console.log("Deleted Room --->", roomId);
-        roomIds = [...updatedRoom];
-        console.log("Updated Rooms --->", updatedRoom);
+        console.log("Deleted Room --->", roomIds);
 
         // message sent to the present user
         roomMembers.forEach((m: string) => {

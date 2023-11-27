@@ -2,8 +2,8 @@
 import React from 'react'
 import { addMessages,deleteAllMessage,leftMessage } from '@/features/websockets/messageSlice';
 import { useAppSelector,useAppDispatch } from '@/store/hook';
+import { removePeer,addPeer,removeStream,addStream } from '@/features/websockets/videoStream';
 import { leftRoom } from '@/features/websockets/userSlice';
-
 
 type GeneralMethodsTypes = {
     leave:()=> void;
@@ -34,6 +34,11 @@ const useGeneralMethods = (props:Props):GeneralMethodsTypes => {
                 type:"join",
                 message:"null"
             }))
+
+            if(props.componentType === 'videoCall'){
+                dispatch(removePeer());
+                dispatch(removeStream());
+            }
         }
     }
 

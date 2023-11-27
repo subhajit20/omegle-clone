@@ -56,6 +56,7 @@ function useWebSocket():WebSocketHookType {
 
     const placeCall = useCallback(async(WS:WebSocket,peer:RTCPeerConnection,localStream:MediaStream,userId:string,receiver:string) =>{
         try{
+            console.log("Sending offer 59");
             localStream.getTracks().forEach((track)=>{
                 peer.addTrack(track,localStream);
             });
@@ -63,6 +64,8 @@ function useWebSocket():WebSocketHookType {
             const offer = await peer.createOffer();
             await peer.setLocalDescription(offer);
             const sdpOffer = peer.localDescription;
+
+            console.log("Sending offer 68");
 
             WS.send(JSON.stringify({
                 openVideo:{

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Heading from '../ui/heading/Heading';
 import Button from '../ui/button/Button';
 
 interface VideoPage {
     roomId?:string;
     memberId?:string;
+    stream:MediaStream | null;
     writeMsg?:()=> void;
     sendMsg?:()=> void;
     searchRoom?:()=> void;
@@ -12,6 +13,10 @@ interface VideoPage {
 }
 
 const VideoPage = (props: VideoPage) => {
+    useEffect(()=>{
+        console.log(props.stream)
+    },[props.stream])
+
   return (
         <div className='w-full relative'>
             <Heading headingName={"Room Id"} styles={'text-center text-2xl'} />
@@ -29,13 +34,16 @@ const VideoPage = (props: VideoPage) => {
                     </svg>} />
 
                 {/* Search room button */}
-                <Button 
-                    btnText={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>} 
-                    btnHandler={props.searchRoom}
-                    btnStyle={'btn outline info'}
-                />
+                {
+                    props.stream === null ? "Loading" : <Button 
+                        btnText={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>} 
+                        btnHandler={props.searchRoom}
+                        btnStyle={'btn outline info'}
+                    />
+                }
+                
 
                 {/* Exit room button */}
                 <Button 

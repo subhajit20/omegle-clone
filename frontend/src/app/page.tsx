@@ -82,23 +82,11 @@ export default function Home() {
           }))
         }else if(incommingData.roomInfo){
           console.log(incommingData.roomInfo)
-          const {roomId,members,option} = incommingData.roomInfo;
+          const {roomId,members} = incommingData.roomInfo;
           dispatch(joinUserToRoom({
             id:roomId,
             members:[...members]
           }))
-
-          if(option === 'connected' && roomMembers.length > 0 && members.length > 0){
-            console.log(userId)
-            let caller = userId === members[0] ? userId : members[1];
-            let receiver = userId !== members[0] ? members[0] : members[1];
-            console.log(caller);
-            console.log(receiver);
-            console.log(roomMembers);
-            if(WS && peer && stream && userId){
-              placeCall(WS,peer,stream,caller,receiver);
-            }
-          }
         }else if(incommingData.message){
           const {from,roomId,message} = incommingData.message;
           console.log(from,message);
@@ -114,22 +102,11 @@ export default function Home() {
             type:"leave",
             message:incommingData.leave
           }))
-        }else if(incommingData.calling){
-          if(userId === roomMembers[1]){
-            WS.send(JSON.stringify({
-                type:"answer",
-                info:"Offerrrrrrrr",
-                receiver:userId,
-                caller:roomMembers[0]
-            }))
-          }
-        }else if(incommingData.accepted){
-          console.log("Accepted .....")
         }
       }
 
     }
-  },[WS,dispatch, roomMembers, userId])
+  },[WS, dispatch, peer, placeCall, roomMembers, stream, userId])
 
 
   return (
