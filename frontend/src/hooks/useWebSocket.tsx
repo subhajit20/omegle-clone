@@ -13,7 +13,7 @@ import { leftMessage } from '@/features/websockets/messageSlice';
 type WebSocketHookType = {
     joinMessageChatRoom:(WS:WebSocket,userId:string) => void,
     joinVideoCallChatRoom:(WS:WebSocket,userId:string) => void,
-    openVideo:() => Promise<MediaProvider | null>,
+    openVideo:() => Promise<MediaStream | null>,
     placeCall:(WS:WebSocket,peer:RTCPeerConnection,localStream:MediaStream,userId:string,receiver:string) => void;
     receiveCall:(WS:WebSocket,peer:RTCPeerConnection,localStream:MediaStream,offer:RTCSessionDescriptionInit,caller:string,receiver:string) => void
 }
@@ -62,6 +62,10 @@ function useWebSocket():WebSocketHookType {
                 peer.addTrack(track,localStream);
             });
 
+            // peer.ontrack = (event) => {
+            //     remoteVideo.srcObject = event.streams[0];
+            // };
+
             const offer = await peer.createOffer();
             await peer.setLocalDescription(offer);
             const sdpOffer = peer.localDescription;
@@ -103,7 +107,7 @@ function useWebSocket():WebSocketHookType {
         }   
     },[])
 
-    const openVideo = async () : Promise<MediaProvider | null> =>{
+    const openVideo = async () : Promise<MediaStream | null> =>{
         try{
             let conf = {
                 video: true,
