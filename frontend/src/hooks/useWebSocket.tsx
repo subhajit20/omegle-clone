@@ -13,6 +13,7 @@ import { leftMessage } from '@/features/websockets/messageSlice';
 type WebSocketHookType = {
     joinMessageChatRoom:(WS:WebSocket,userId:string) => void,
     joinVideoCallChatRoom:(WS:WebSocket,userId:string) => void,
+    openVideo:() => Promise<MediaProvider | null>,
     placeCall:(WS:WebSocket,peer:RTCPeerConnection,localStream:MediaStream,userId:string,receiver:string) => void;
     receiveCall:(WS:WebSocket,peer:RTCPeerConnection,localStream:MediaStream,offer:RTCSessionDescriptionInit,caller:string,receiver:string) => void
 }
@@ -102,11 +103,25 @@ function useWebSocket():WebSocketHookType {
         }   
     },[])
 
+    const openVideo = async () : Promise<MediaProvider | null> =>{
+        try{
+            let conf = {
+                video: true,
+                audio: true
+            }
+            const media = await navigator.mediaDevices.getUserMedia(conf);
+            return media
+        }catch(e){
+            return null
+        }
+    }
+
     return {
         joinMessageChatRoom:joinMessageChatRoom,
         joinVideoCallChatRoom:joinVideoCallChatRoom,
         placeCall:placeCall,
-        receiveCall:receiveCall
+        receiveCall:receiveCall,
+        openVideo:openVideo
     }
 }
 

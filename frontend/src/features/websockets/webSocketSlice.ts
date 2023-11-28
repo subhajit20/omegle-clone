@@ -45,5 +45,5 @@ export const webSocketSlice = createSlice({
 });
 
 export const { connect, disconnect } = webSocketSlice.actions;
-// export const selectCount = (state: RootState) => state.counterReducer.value;
+export const selectWebSocket = (state: RootState) => state.webSocketReducer;
 export default webSocketSlice.reducer;

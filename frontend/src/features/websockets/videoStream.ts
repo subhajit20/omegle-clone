@@ -36,5 +36,5 @@ const videoSlice = createSlice({
 
 export const { addPeer, removePeer, addStream, removeStream } =
   videoSlice.actions;
-// export const selectVideoStream = (state: RootState) => state.videoReducer;
+export const selectVideoStream = (state: RootState) => state.videoReducer;
 export default videoSlice.reducer;
