@@ -15,8 +15,23 @@ import { addMessages } from '@/features/websockets/messageSlice';
 
 type Props = {}
 
+interface videoStreamState {
+    localStream:MediaStream | null;
+    remoteStream:MediaStream | null;
+}
+
+const iceServers = [
+    { urls: 'stun:stun.l.google.com:19302' },
+];
+const configuration = { iceServers };
+
 const VideoCallWrapper = (props: Props) => {
-    const [mediaProvider,setMedia] = useState<MediaStream | null>(null)
+    const [newPeer,setPeer] = useState<RTCPeerConnection>(new RTCPeerConnection(configuration));
+    const [mediaProvider,setMedia] = useState<MediaStream | null>(null);
+    const [streams,setVideoStreams] = useState<videoStreamState>({
+        localStream:null,
+        remoteStream:null
+    });
     const {search,leave} = useGeneralMethods({
         componentType:"videoCall"
     });
@@ -27,23 +42,31 @@ const VideoCallWrapper = (props: Props) => {
     const dispatch = useAppDispatch()
 
     useEffect(()=>{
-        const iceServers = [
-            { urls: 'stun:stun.l.google.com:19302' },
-        ];
-        const configuration = { iceServers };
-        const newPeer = new RTCPeerConnection(configuration);
-
 
         newPeer.addEventListener('icecandidate',(e)=>{
-            console.log(e);
+            console.log(e.candidate);
+            if(WS){
+                WS.send(JSON.stringify({
+                    iceCandidate : {
+                        receiver: userId === roomMembers[0] ? roomMembers[1] : roomMembers[0],
+                        iceInfo: e.candidate,
+                    }
+                }));
+            }
         })
 
         newPeer.ontrack = (e) =>{
-            console.log(e.streams)
+            console.log(e.streams);
+
+            setVideoStreams((prev)=>{
+                return {
+                        ...prev,
+                        remoteStream:e.streams[0]
+            }})
         }
 
         if(WS){
-            WS.onmessage = (e) =>{
+            WS.onmessage = async (e) =>{
                 const incommingData = JSON.parse(e.data);
 
                 if(incommingData.roomInfo){
@@ -63,6 +86,12 @@ const VideoCallWrapper = (props: Props) => {
                             .then((data)=>{
                                 console.log(data);
                                 setMedia(data);
+                                setVideoStreams((prev)=>{
+                                    return {
+                                        ...prev,
+                                        localStream:data
+                                    }
+                                })
                                 placeCall(
                                     WS,
                                     newPeer,
@@ -93,7 +122,7 @@ const VideoCallWrapper = (props: Props) => {
                     }))
                 }else if(incommingData.leave){
                     dispatch(leftRoom());
-
+                    setPeer(new RTCPeerConnection(configuration));
                     console.log(incommingData.leave);
                     if(mediaProvider !== null){
                         mediaProvider.getTracks().forEach((tracks)=>{
@@ -108,6 +137,8 @@ const VideoCallWrapper = (props: Props) => {
                     // }))
                 }else if(incommingData.calling){
                     console.log(incommingData.calling);
+                    console.log(roomMembers);
+                    const caller = userId !== roomMembers[1] ? roomMembers[1] : roomMembers[0];
                     
                     if(mediaProvider){
                         receiveCall(
@@ -115,7 +146,7 @@ const VideoCallWrapper = (props: Props) => {
                             newPeer,
                             mediaProvider,
                             incommingData.calling.offer,
-                            userId === roomMembers[1] ? roomMembers[0] : roomMembers[1], // caller
+                            incommingData.calling.from, // caller
                             userId! // receiver
                         )
                     }else{
@@ -128,24 +159,40 @@ const VideoCallWrapper = (props: Props) => {
                                     newPeer,
                                     data!,
                                     incommingData.calling.offer,
-                                    userId === roomMembers[1] ? roomMembers[0] : roomMembers[1], // caller
+                                    incommingData.calling.from, // caller
                                     userId!
                                 )
                             })
                     }
                 }else if(incommingData.accepted){
-                    console.log(incommingData.accepted);
+                    try{
+                        console.log(incommingData.accepted);
+                        const {answer} = incommingData.accepted;
+                        const remoteDesc = new RTCSessionDescription(answer);
+                        await newPeer.setRemoteDescription(remoteDesc);
+                    }catch(e){
+                        console.log(e)
+                    }
+                }else if(incommingData.iceCandidate){
+                    const {iceInfo} = incommingData.iceCandidate;
+                    try{
+                        await newPeer.addIceCandidate(iceInfo)
+                    }catch{
+                        console.log(iceInfo)
+                    }
                 }
             }
         }
-    },[WS, dispatch, mediaProvider, openVideo, placeCall, receiveCall, roomMembers, userId])
+    },[WS, dispatch, mediaProvider, newPeer, openVideo, placeCall, receiveCall, roomMembers, userId])
 
-    useEffect(()=>{
-        console.log(roomMembers)
-    },[roomMembers])
+    // useEffect(()=>{
+    //     if(roomMembers.length === 0){
+    //         setPeer(new RTCPeerConnection(configuration));
+    //     }
+    // },[roomMembers])
   return (
     <div className='flex justify-center h-[38.2rem] md:h-[49.2rem]'>
-        <Frame stream={roomMembers.length === 2 ? mediaProvider : null} />
+        <Frame stream={roomMembers.length === 2 ? mediaProvider : null} remoteStream={roomMembers.length === 2 ? streams.remoteStream : null} />
         <VideoPage stream={stream} searchRoom={search} existRoom={leave} />
     </div>
   )

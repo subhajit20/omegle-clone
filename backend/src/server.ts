@@ -180,27 +180,53 @@ wss.on("connection", (ws: Nodes) => {
     } else if (data.openVideo) {
       const { type, info, caller, receiver } = data.openVideo;
       console.log(type);
-      console.log(caller);
-      if (type === "offer" && userMapping[caller] && userMapping[receiver]) {
+      console.log("Receiver", userMapping[receiver][receiver]);
+      console.log("Caller", userMapping[caller][caller]);
+
+      try {
+        if (userMapping[caller] && userMapping[receiver]) {
+          if (type === "answer") {
+            console.log("Answer came");
+            userMapping[caller].send(
+              JSON.stringify({
+                accepted: {
+                  from: receiver,
+                  answer: info,
+                },
+              })
+            );
+            // userMapping[caller].send(
+            //   JSON.stringify({
+            //     accepted: {
+            //       from: receiver,
+            //       answer: info,
+            //     },
+            //   })
+            // );
+          } else if (type === "offer") {
+            userMapping[receiver].send(
+              JSON.stringify({
+                calling: {
+                  from: caller,
+                  offer: info,
+                },
+              })
+            );
+          }
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    } else if (data.iceCandidate) {
+      const { receiver, iceInfo } = data.iceCandidate;
+      if (userMapping[receiver]) {
         userMapping[receiver].send(
           JSON.stringify({
-            calling: {
-              from: caller,
-              offer: info,
+            iceCandidate: {
+              iceInfo: iceInfo,
             },
           })
         );
-      } else if (
-        type === "answer" &&
-        userMapping[caller] &&
-        userMapping[receiver]
-      ) {
-        userMapping[caller].send({
-          accepted: {
-            from: receiver,
-            answer: info,
-          },
-        });
       }
     }
   });

@@ -92,14 +92,14 @@ function useWebSocket():WebSocketHookType {
             })
             await peer.setRemoteDescription(new RTCSessionDescription(offer));
             const answer = await peer.createAnswer();
-            await peer.setLocalDescription(answer)
+            await peer.setLocalDescription(answer);
 
             WS.send(JSON.stringify({
                 openVideo:{
                     type:"answer",
                     info:answer,
-                    receiver:caller,
-                    caller:receiver
+                    caller:caller,
+                    receiver:receiver
                 }
             }))
         }catch(e){
