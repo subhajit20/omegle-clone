@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.chatTextToColor {
+    color:#52A56A;
+    font-weight: bold;
+}
+
+.chatTextFromColor {
+    color:#F06612;
+    font-weight: bold;
+}
