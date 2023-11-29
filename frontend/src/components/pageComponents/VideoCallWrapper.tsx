@@ -42,29 +42,6 @@ const VideoCallWrapper = (props: Props) => {
     const dispatch = useAppDispatch()
 
     useEffect(()=>{
-
-        newPeer.addEventListener('icecandidate',(e)=>{
-            console.log(e.candidate);
-            if(WS){
-                WS.send(JSON.stringify({
-                    iceCandidate : {
-                        receiver: userId === roomMembers[0] ? roomMembers[1] : roomMembers[0],
-                        iceInfo: e.candidate,
-                    }
-                }));
-            }
-        })
-
-        newPeer.ontrack = (e) =>{
-            console.log(e.streams);
-
-            setVideoStreams((prev)=>{
-                return {
-                        ...prev,
-                        remoteStream:e.streams[0]
-            }})
-        }
-
         if(WS){
             WS.onmessage = async (e) =>{
                 const incommingData = JSON.parse(e.data);
@@ -129,6 +106,12 @@ const VideoCallWrapper = (props: Props) => {
                             tracks.enabled = false
                         })
                     }
+                    setVideoStreams((prev)=>{
+                        return {
+                            localStream:null,
+                            remoteStream:null
+                        }
+                    })
 
                     // dispatch(deleteAllMessage());
                     // dispatch(leftMessage({
@@ -185,11 +168,43 @@ const VideoCallWrapper = (props: Props) => {
         }
     },[WS, dispatch, mediaProvider, newPeer, openVideo, placeCall, receiveCall, roomMembers, userId])
 
-    // useEffect(()=>{
-    //     if(roomMembers.length === 0){
-    //         setPeer(new RTCPeerConnection(configuration));
-    //     }
-    // },[roomMembers])
+    useEffect(()=>{
+        if(roomMembers.length === 0){
+            setPeer(new RTCPeerConnection(configuration));
+            setVideoStreams((prev)=>{
+                return {
+                    localStream:null,
+                    remoteStream:null
+                }
+            })
+        }
+    },[roomMembers])
+
+    useEffect(()=>{
+        if(newPeer){
+            newPeer.ontrack = (e) =>{
+                console.log(e.streams);
+
+                setVideoStreams((prev)=>{
+                    return {
+                            ...prev,
+                            remoteStream:e.streams[0]
+                }})
+            }
+
+            newPeer.addEventListener('icecandidate',(e)=>{
+                console.log(e.candidate);
+                if(WS){
+                    WS.send(JSON.stringify({
+                        iceCandidate : {
+                            receiver: userId === roomMembers[0] ? roomMembers[1] : roomMembers[0],
+                            iceInfo: e.candidate,
+                        }
+                    }));
+                }
+            })
+        }
+    },[newPeer, WS, userId, roomMembers])
   return (
     <div className='flex justify-center h-[38.2rem] md:h-[49.2rem]'>
         <Frame stream={roomMembers.length === 2 ? mediaProvider : null} remoteStream={roomMembers.length === 2 ? streams.remoteStream : null} />
