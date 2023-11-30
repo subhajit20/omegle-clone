@@ -7,8 +7,7 @@ const page:React.FC = () => {
   return (
     <div className="min-h-screen relative">
       {/* <VideoCallWrapper /> */}
-      <TestVideoWrapper
-      />
+      <TestVideoWrapper />
     </div>
   )
 }

@@ -1,12 +1,19 @@
+'use client'
 import React from 'react'
 import TopInfoBar from '../TopInfoBar'
 import FunctionBar from '@/components/pageComponents/FunctionBar';
 import VideoChatSection from '../VideoChatSection';
 import DisplayMessages from '../DisplayMessages';
+import useGeneralMethods from '@/hooks/useGeneralMethods';
 
-type Props = {}
+interface TestVideoWrapperProps {
+}
 
-const TestVideoWrapper = (props: Props) => {
+const TestVideoWrapper = (props: TestVideoWrapperProps) => {
+  const {search,leave} = useGeneralMethods({
+    componentType:"textMessage"
+  })
+
   return (
     <div className='w-full h-full relative'>
         <TopInfoBar
@@ -19,7 +26,7 @@ const TestVideoWrapper = (props: Props) => {
                 <DisplayMessages allMessages={[]} />
             </div>
         </div>
-        <FunctionBar roomMembers={[]} stream={null} />
+        <FunctionBar searchRoom={search} existRoom={leave}  />
     </div>
   )
 }

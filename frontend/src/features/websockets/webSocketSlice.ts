@@ -20,7 +20,7 @@ export const webSocketSlice = createSlice({
   initialState: WebSocketState,
   reducers: {
     connect: (state, action: PayloadAction<params>) => {
-      console.log(state.WS);
+      // console.log(state.WS);
       try {
         if (state.WS === null && state.connected === false) {
           let connection = new WebSocket(
