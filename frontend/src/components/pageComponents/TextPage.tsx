@@ -1,18 +1,15 @@
 'use client'
-import React, { useEffect,useState } from 'react'
-import Heading from '@/components/ui/heading/Heading';
-import { useAppSelector,useAppDispatch } from '@/store/hook';
-import { leftRoom } from '@/features/websockets/userSlice';
-import { addMessages,deleteAllMessage,leftMessage } from '@/features/websockets/messageSlice';
+import React, { useEffect,useState } from 'react';
+import { useAppSelector } from '@/store/hook';
 import DisplayMessages from './DisplayMessages';
+import TopInfoBar from './TopInfoBar';
+import FunctionBar from './FunctionBar';
+import useGeneralMethods from '@/hooks/useGeneralMethods';
 import { notification } from 'antd';
 import type { NotificationPlacement } from 'antd/es/notification/interface';
 import { SmileOutlined } from '@ant-design/icons';
 import DotCircle from '../loader/DotCircle';
 import ChatContainer from '../ui/container/ChatContainer';
-import TopInfoBar from './TopInfoBar';
-import FunctionBar from './FunctionBar';
-import useGeneralMethods from '@/hooks/useGeneralMethods';
 
 const TextPage:React.FC = () => {
     const [message,setMessage] = useState<string | null>(null)
@@ -32,7 +29,7 @@ const TextPage:React.FC = () => {
     };
 
     useEffect(()=>{
-        if(roomMembers.length > 1){
+        if(roomMembers.length === 2){
             openNotification("topRight");
         }
     },[roomMembers])

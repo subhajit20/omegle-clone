@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react'
+import React from 'react';
 import { addMessages,deleteAllMessage,leftMessage } from '@/features/websockets/messageSlice';
 import { useAppSelector,useAppDispatch } from '@/store/hook';
 import { removePeer,addPeer,removeStream,addStream } from '@/features/websockets/videoStream';
@@ -16,7 +16,6 @@ interface Props{
 }
 
 const useGeneralMethods = (props:Props):GeneralMethodsTypes => {
-    const [message,setMessage] = useState<string | null>(null)
     const { userId,roomId,roomMembers } = useAppSelector((state)=> state.userReducer);
     const { WS } = useAppSelector((state)=> state.webSocketReducer);
     const dispatch = useAppDispatch();
