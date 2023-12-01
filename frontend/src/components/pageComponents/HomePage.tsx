@@ -5,6 +5,7 @@ import {connect} from '@/features/websockets/webSocketSlice';
 import useWebSocket from "@/hooks/useWebSocket";
 import Link from "next/link";
 import useWebSocketHook from "@/hooks/useWebSocketHook";
+import DotCircle from "../loader/DotCircle";
 
 
 export default function HomePage() {
@@ -33,6 +34,9 @@ export default function HomePage() {
 
   return (
     <React.Fragment>
+        {
+          userId === null && <div className="h-auto flex justify-center items-center"><DotCircle /></div>
+        }
       {
         userId !== null && <div className="flex justify-center items-center gap-x-4 min-h-[40rem]">
         <Link href={'/text'} onClick={()=> joinMessageChatRoom(WS!,userId!)} >

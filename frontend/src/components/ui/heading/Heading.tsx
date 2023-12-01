@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react'
 
 type HeadingProps = {
-    headingName?:string | ReactElement
+    headingName?:string | ReactElement | null
     styles?:string
 }
 

@@ -26,7 +26,7 @@ function useWebSocket():WebSocketHookType {
             WS.send(JSON.stringify({
             join:{
                 userId:userId,
-                type:"text"
+                type:"textChat"
             }
             }))
             dispatch(leftMessage({

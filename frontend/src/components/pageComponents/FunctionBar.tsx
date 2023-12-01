@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { EventHandler } from 'react'
 import Button from '../ui/button/Button';
 import { selectUser } from '@/features/websockets/userSlice';
 import { useAppSelector } from '@/store/hook';
 
 
 interface FunctionBarProps {
-    writeMsg?:()=> void;
+    writeMsg?:(e:any)=> void;
     sendMsg?:()=> void;
     searchRoom?:()=> void;
     existRoom?:()=> void;

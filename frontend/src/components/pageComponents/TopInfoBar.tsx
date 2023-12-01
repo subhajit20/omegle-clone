@@ -1,19 +1,19 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import Heading from '../ui/heading/Heading';
 import dynamic from 'next/dynamic';
 
 
 interface TopInfoBarProps {
-    roomId?:string;
-    connedtedWith?:string
+    roomId?:string | ReactElement | null;
+    connedtedWith?:string | ReactElement | null
 }
 
 const TopInfoBar = (props: TopInfoBarProps) => {
   return (
     <React.Fragment>
         <div className='max-w-full py-2'>
-            <Heading styles={"text-center text-xl"} headingName={`Room Id - ${props.roomId}`} />
-            <Heading styles={"text-center text-base"} headingName={`Connected With - ${props.connedtedWith}`} />
+            <Heading styles={"text-center text-xl"} headingName={props.roomId} />
+            <Heading styles={"text-center text-base"} headingName={props.connedtedWith} />
         </div>
     </React.Fragment>
   )
