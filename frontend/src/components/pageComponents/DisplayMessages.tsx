@@ -21,7 +21,7 @@ const displaySenderMessage: DisplayMessage = {
 
 const DisplayMessages :React.FC<MessageProps> = (props: MessageProps) => {
   return (
-    <div className='p-2 h-3/6 w-full overflow-y-scroll'>
+    <div className='p-2 h-[30rem] w-full overflow-y-scroll'>
         {
             props.allMessages.length > 0 ? props.allMessages.map((msg,i)=>{
                 if(msg.type === "from"){

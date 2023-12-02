@@ -12,6 +12,12 @@ import { useAppDispatch } from '@/store/hook';
 import { joinUserToRoom } from '@/features/websockets/userSlice';
 import useWebSocket from '@/hooks/useWebSocket';
 import { addMessages } from '@/features/websockets/messageSlice';
+import ChatContainer from '../ui/container/ChatContainer';
+import TopInfoBar from './TopInfoBar';
+import DotCircle from '../loader/DotCircle';
+import DisplayMessages from './DisplayMessages';
+import { selectMessage } from '@/features/websockets/messageSlice';
+import FunctionBar from './FunctionBar';
 
 type Props = {}
 
@@ -26,19 +32,21 @@ const iceServers = [
 const configuration = { iceServers };
 
 const VideoCallWrapper = (props: Props) => {
+    const [message,setMessage] = useState<string | null>(null)
     const [newPeer,setPeer] = useState<RTCPeerConnection>(new RTCPeerConnection(configuration));
     const [mediaProvider,setMedia] = useState<MediaStream | null>(null);
     const [streams,setVideoStreams] = useState<videoStreamState>({
         localStream:null,
         remoteStream:null
     });
-    const {search,leave} = useGeneralMethods({
+    const {search,leave,sendMessage} = useGeneralMethods({
         componentType:"videoCall"
     });
     const {placeCall,openVideo,receiveCall} = useWebSocket();
     const {stream} = useAppSelector(selectVideoStream);
     const {WS} = useAppSelector(selectWebSocket);
-    const {userId,roomMembers} = useAppSelector(selectUser);
+    const {userId,roomMembers,roomId} = useAppSelector(selectUser);
+    const {allMessages} = useAppSelector(selectMessage)
     const dispatch = useAppDispatch()
 
     useEffect(()=>{
@@ -206,10 +214,23 @@ const VideoCallWrapper = (props: Props) => {
         }
     },[newPeer, WS, userId, roomMembers])
   return (
-    <div className='flex justify-center h-[38.2rem] md:h-[49.2rem]'>
-        <Frame stream={roomMembers.length === 2 ? mediaProvider : null} remoteStream={roomMembers.length === 2 ? streams.remoteStream : null} />
-        <VideoPage stream={stream} searchRoom={search} existRoom={leave} />
-    </div>
+    <ChatContainer>
+        <TopInfoBar
+            roomId={roomId ? `RoomId - ${roomId}` : ""}
+            connedtedWith={roomMembers.length === 0 ? "Disconnected" : roomMembers.length > 1 ? `Connected with ${userId !== roomMembers[0] ? roomMembers[0] : roomMembers[1]}` : <div className='w-full flex justify-center'><DotCircle /></div>}
+        />
+        <div className='flex justify-center w-full h-auto'>
+            <Frame stream={roomMembers.length === 2 ? mediaProvider : null} remoteStream={roomMembers.length === 2 ? streams.remoteStream : null} />
+            <DisplayMessages allMessages={allMessages} />
+            {/* <VideoPage stream={stream} searchRoom={search} existRoom={leave} /> */}
+        </div>
+        <FunctionBar 
+            searchRoom={search}
+            existRoom={leave}
+            writeMsg={(e)=> setMessage(e.target.value)}
+            sendMsg={()=> sendMessage(message!)}
+        />
+    </ChatContainer>
   )
 }
 

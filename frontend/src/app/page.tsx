@@ -1,4 +1,6 @@
-import HomePage from "@/components/pageComponents/HomePage"
+// import HomePage from "@/components/pageComponents/HomePage"
+import dynamic from "next/dynamic"
+const HomePage = dynamic(()=> import("@/components/pageComponents/HomePage"));
 
 export default function Home() {
 

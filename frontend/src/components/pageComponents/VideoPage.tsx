@@ -23,8 +23,6 @@ const VideoPage = (props: VideoPage) => {
 
   return (
         <div className='w-full relative'>
-            <Heading headingName={"Room Id"} styles={'text-center text-2xl'} />
-            <Heading headingName={"Member Id"} styles={'text-center text-2xl'} />
             <div className='flex justify-center gap-3 w-full mb-3 fixed bottom-0'>
                 {/* Write Message input box */}
                 <input 

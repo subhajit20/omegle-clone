@@ -8,7 +8,7 @@ import { leftRoom } from '@/features/websockets/userSlice';
 type GeneralMethodsTypes = {
     leave:()=> void;
     search:()=> void;
-    sendMessage:(message:string)=> void
+    sendMessage:(message:string)=> void;
 }
 
 interface Props{

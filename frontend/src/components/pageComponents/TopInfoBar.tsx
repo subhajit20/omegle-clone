@@ -1,6 +1,5 @@
 import React, { ReactElement } from 'react';
 import Heading from '../ui/heading/Heading';
-import dynamic from 'next/dynamic';
 
 
 interface TopInfoBarProps {
