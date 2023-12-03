@@ -1,6 +1,4 @@
-// 'use client'
 import React,{useEffect, useRef} from 'react';
-
 
 type Props = {
     stream:MediaProvider | null;
