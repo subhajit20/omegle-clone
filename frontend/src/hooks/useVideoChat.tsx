@@ -94,14 +94,10 @@ const useVideoChat = (props: useVideoChat): any => {
                 }else if(incommingData.leave){
                     dispatch(leftRoom());
                     setPeer(new RTCPeerConnection(configuration));
-                    console.log(incommingData.leave);
-                    if(mediaProvider !== null){
-                        mediaProvider.getTracks().forEach((tracks)=>{
-                            tracks.enabled = false
-                        })
-                    }
+                    setMedia(null);
                     setVideoStreams((prev)=>{
                         return {
+                            ...prev,
                             localStream:null,
                             remoteStream:null
                         }
