@@ -6,6 +6,7 @@ import useWebSocket from "@/hooks/useWebSocket";
 import Link from "next/link";
 import useWebSocketHook from "@/hooks/useWebSocketHook";
 import DotCircle from "../loader/DotCircle";
+import Button from "../ui/button/Button";
 
 
 export default function HomePage() {
@@ -40,15 +41,11 @@ export default function HomePage() {
       {
         userId !== null && <div className="flex justify-center items-center gap-x-4 min-h-[40rem]">
         <Link href={'/text'} onClick={()=> joinMessageChatRoom(WS!,userId!)} >
-          <button  className='btn outline success w-[7rem] text-base'>
-          Text
-          </button>
+          <Button btnText={"Text"}  btnStyle='btn outline success w-[7rem] text-base' />
         </Link>
         <span>or</span>
         <Link href={"/videocall"} onClick={()=> joinVideoCallChatRoom(WS!,userId!)}>
-          <button className='btn outline warn w-[8rem] text-base'>
-            Video Call
-          </button>
+          <Button btnText={"Video Call"} btnStyle='btn outline warn w-[8rem] text-base' />
         </Link>
       </div> 
       }
