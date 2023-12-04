@@ -7,7 +7,7 @@ import Link from "next/link";
 import useWebSocketHook from "@/hooks/useWebSocketHook";
 import DotCircle from "../loader/DotCircle";
 import Button from "../ui/button/Button";
-import { VideoCallIcon } from "@/icons/externalIcons";
+import { VideoCallIcon } from "../../icons/externalIcons";
 
 export default function HomePage() {
   const {joinMessageChatRoom,joinVideoCallChatRoom} = useWebSocket()
@@ -45,9 +45,7 @@ export default function HomePage() {
         </Link>
         <span>or</span>
         <Link href={"/videocall"} onClick={()=> joinVideoCallChatRoom(WS!,userId!)}>
-          <Button
-            btnText={<VideoCallIcon />}
-            btnStyle='btn outline warn w-[8rem] text-base' />
+          <Button btnText={<VideoCallIcon />} btnStyle='btn outline warn w-[8rem] text-base' />
         </Link>
       </div>
       }
