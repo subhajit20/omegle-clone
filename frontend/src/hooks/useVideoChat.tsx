@@ -2,7 +2,7 @@ import { useEffect,useState } from 'react';
 import { useAppDispatch,useAppSelector } from '@/store/hook';
 import { joinUserToRoom, leftRoom, selectUser } from '@/features/websockets/userSlice';
 import { selectWebSocket } from '@/features/websockets/webSocketSlice';
-import { addMessages } from '@/features/websockets/messageSlice';
+import { addMessages, deleteAllMessage } from '@/features/websockets/messageSlice';
 import useWebSocket from './useWebSocket';
 
 interface useVideoChat{
@@ -21,7 +21,7 @@ const configuration = { iceServers };
 const useVideoChat = (props: useVideoChat): any => {
     const [mediaProvider,setMedia] = useState<MediaStream | null>(null);
     const [message,setMessage] = useState<string | null>(null)
-    const [newPeer,setPeer] = useState<RTCPeerConnection>(new RTCPeerConnection(configuration));
+    const [newPeer,setPeer] = useState<RTCPeerConnection | null>(null);
     const [streams,setVideoStreams] = useState<videoStreamState>({
         localStream:null,
         remoteStream:null
@@ -49,9 +49,11 @@ const useVideoChat = (props: useVideoChat): any => {
                     }))
 
                     if(option === "connected" && userId === roomMembers[0]){
+                        const new_peer = new RTCPeerConnection(configuration);
                         // create peer
                         // create stream
                         // open video
+                        setPeer(new_peer);
                         if(mediaProvider === null){
                             openVideo()
                             .then((data)=>{
@@ -65,7 +67,7 @@ const useVideoChat = (props: useVideoChat): any => {
                                 })
                                 placeCall(
                                     WS,
-                                    newPeer,
+                                    new_peer,
                                     data!,
                                     userId,
                                     members[1]
@@ -77,7 +79,7 @@ const useVideoChat = (props: useVideoChat): any => {
                             })
                             placeCall(
                                 WS,
-                                newPeer,
+                                new_peer,
                                 mediaProvider,
                                 userId,
                                 members[1]
@@ -92,8 +94,7 @@ const useVideoChat = (props: useVideoChat): any => {
                         message:message
                     }))
                 }else if(incommingData.leave){
-                    dispatch(leftRoom());
-                    setPeer(new RTCPeerConnection(configuration));
+                    setPeer(null);
                     setMedia(null);
                     setVideoStreams((prev)=>{
                         return {
@@ -102,8 +103,9 @@ const useVideoChat = (props: useVideoChat): any => {
                             remoteStream:null
                         }
                     })
-
-                    // dispatch(deleteAllMessage());
+                    
+                    dispatch(leftRoom());
+                    dispatch(deleteAllMessage());
                     // dispatch(leftMessage({
                     //     type:"leave",
                     //     message:incommingData.leave
@@ -111,25 +113,28 @@ const useVideoChat = (props: useVideoChat): any => {
                 }else if(incommingData.calling){
                     console.log(incommingData.calling);
                     console.log(roomMembers);
+                    const new_peer = new RTCPeerConnection(configuration);
+                    setPeer(new_peer);
+
                     const caller = userId !== roomMembers[1] ? roomMembers[1] : roomMembers[0];
-                    
+
                     if(mediaProvider){
                         receiveCall(
                             WS,
-                            newPeer,
+                            new_peer,
                             mediaProvider,
                             incommingData.calling.offer,
                             incommingData.calling.from, // caller
                             userId! // receiver
                         )
                     }else{
-                        openVideo()
+                        await openVideo()
                             .then((data)=>{
                                 console.log(data);
                                 setMedia(data);
                                 receiveCall(
                                     WS,
-                                    newPeer,
+                                    new_peer,
                                     data!,
                                     incommingData.calling.offer,
                                     incommingData.calling.from, // caller
@@ -139,17 +144,21 @@ const useVideoChat = (props: useVideoChat): any => {
                     }
                 }else if(incommingData.accepted){
                     try{
-                        console.log(incommingData.accepted);
-                        const {answer} = incommingData.accepted;
-                        const remoteDesc = new RTCSessionDescription(answer);
-                        await newPeer.setRemoteDescription(remoteDesc);
+                        if(newPeer !== null){
+                            console.log(incommingData.accepted);
+                            const {answer} = incommingData.accepted;
+                            const remoteDesc = new RTCSessionDescription(answer);
+                            await newPeer.setRemoteDescription(remoteDesc);
+                        }
                     }catch(e){
                         console.log(e)
                     }
                 }else if(incommingData.iceCandidate){
                     const {iceInfo} = incommingData.iceCandidate;
                     try{
-                        await newPeer.addIceCandidate(iceInfo)
+                        if(newPeer !== null){
+                            await newPeer.addIceCandidate(iceInfo)
+                        }
                     }catch{
                         console.log(iceInfo)
                     }
@@ -161,7 +170,7 @@ const useVideoChat = (props: useVideoChat): any => {
 
     useEffect(()=>{
         if(roomMembers.length === 0){
-            setPeer(new RTCPeerConnection(configuration));
+            setPeer(null);
             setVideoStreams((prev)=>{
                 return {
                     localStream:null,

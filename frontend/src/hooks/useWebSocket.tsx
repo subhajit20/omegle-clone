@@ -62,10 +62,6 @@ function useWebSocket():WebSocketHookType {
                 peer.addTrack(track,localStream);
             });
 
-            // peer.ontrack = (event) => {
-            //     remoteVideo.srcObject = event.streams[0];
-            // };
-
             const offer = await peer.createOffer();
             await peer.setLocalDescription(offer);
             const sdpOffer = peer.localDescription;
