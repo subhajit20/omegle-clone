@@ -76,7 +76,7 @@ const TextPage:React.FC = () => {
             {contextHolder}
             <TopInfoBar
                 roomId={roomId ? `RoomId - ${roomId}` : ""}
-                connedtedWith={roomMembers.length === 0 ? "Disconnected" : roomMembers.length > 1 ? `Connected with ${userId !== roomMembers[0] ? roomMembers[0] : roomMembers[1]}` : <div className='w-full flex justify-center'><DotCircle /></div>}
+                connedtedWith={roomMembers.length === 0 ? "Disconnected" : roomMembers.length > 1 ? `Connected with ${userId !== roomMembers[0] ? roomMembers[0] : roomMembers[1]}` : <div className='w-full flex justify-center'>Wait a moment...Searching stranger</div>}
             />
             <div className='w-full h-auto'>
                 <DisplayMessages allMessages={allMessages} />

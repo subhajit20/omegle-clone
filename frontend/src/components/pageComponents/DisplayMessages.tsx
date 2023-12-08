@@ -38,7 +38,7 @@ const DisplayMessages :React.FC<MessageProps> = (props: MessageProps) => {
             }) : ''
         }
         {
-            typing && <MessageCard message={"Typing..."} styles={<Wave />} />
+            typing && <MessageCard message={<Wave />} styles={{}} />
         }
     </div>
   )
