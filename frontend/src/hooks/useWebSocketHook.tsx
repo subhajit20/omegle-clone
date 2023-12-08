@@ -1,7 +1,7 @@
 import React,{useEffect} from 'react'
 import { useAppDispatch } from '@/store/hook'
 import { joinUserToRoom, leftRoom, loadUser } from '@/features/websockets/userSlice';
-import { addMessages, deleteAllMessage, leftMessage } from '@/features/websockets/messageSlice';
+import { addMessages, deleteAllMessage, leftMessage, setTyping, unSetTyping } from '@/features/websockets/messageSlice';
 
 
 type webSocketProps = {
@@ -33,6 +33,7 @@ const useWebSocketHook = (props:webSocketProps) : void => {
         }else if(incommingData.message){
           const {from,roomId,message} = incommingData.message;
           console.log(from,message);
+          dispatch(unSetTyping());
           dispatch(addMessages({
             type:"from",
             message:message
@@ -45,6 +46,10 @@ const useWebSocketHook = (props:webSocketProps) : void => {
             type:"leave",
             message:incommingData.leave
           }))
+        }else if(incommingData.typing){
+          const {from} = incommingData.typing;
+          console.log(from);
+          dispatch(setTyping());
         }
       }
 

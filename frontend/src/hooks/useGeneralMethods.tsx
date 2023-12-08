@@ -2,7 +2,8 @@
 import React from 'react';
 import { addMessages,deleteAllMessage,leftMessage } from '@/features/websockets/messageSlice';
 import { useAppSelector,useAppDispatch } from '@/store/hook';
-import { removePeer,addPeer,removeStream,addStream } from '@/features/websockets/videoStream';
+import { removePeer,removeStream } from '@/features/websockets/videoStream';
+import { selectUser } from '@/features/websockets/userSlice';
 import { leftRoom } from '@/features/websockets/userSlice';
 
 type GeneralMethodsTypes = {
@@ -16,7 +17,7 @@ interface Props{
 }
 
 const useGeneralMethods = (props:Props):GeneralMethodsTypes => {
-    const { userId,roomId,roomMembers } = useAppSelector((state)=> state.userReducer);
+    const { userId,roomId,roomMembers } = useAppSelector(selectUser);
     const { WS } = useAppSelector((state)=> state.webSocketReducer);
     const dispatch = useAppDispatch();
 

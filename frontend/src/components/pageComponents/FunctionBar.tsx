@@ -21,8 +21,9 @@ const FunctionBar = (props: FunctionBarProps) => {
                 <input 
                     disabled={roomMembers.length === 2 ? false : true}
                     className='input outline success max-w-[20rem] md:max-w-[60rem] bg-transparent text-slate-800 '
-                    placeholder='Write Message'
+                    placeholder={'Write Message'}
                     onChange={props.writeMsg}
+                    type='text'
                 />
 
                 {/* Send Message button */}

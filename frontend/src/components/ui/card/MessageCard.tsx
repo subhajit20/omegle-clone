@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { DisplayMessage } from '../../../types/Message';
 
 type Props = {
-    message:string
+    message:string | ReactElement
     styles:DisplayMessage
 }
 

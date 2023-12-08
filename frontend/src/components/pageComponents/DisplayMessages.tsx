@@ -2,6 +2,8 @@ import React from 'react';
 import { MesssageType } from '@/features/websockets/messageSlice';
 import MessageCard from '../ui/card/MessageCard';
 import { DisplayMessage } from '../../types/Message';
+import { selectMessage } from '@/features/websockets/messageSlice';
+import { useAppSelector } from '@/store/hook';
 
 interface MessageProps {
     allMessages:MesssageType[]
@@ -20,6 +22,7 @@ const displaySenderMessage: DisplayMessage = {
 }
 
 const DisplayMessages :React.FC<MessageProps> = (props: MessageProps) => {
+    const {typing} = useAppSelector(selectMessage);
   return (
     <div className='p-2 h-[30rem] w-full overflow-y-scroll'>
         {
@@ -32,6 +35,9 @@ const DisplayMessages :React.FC<MessageProps> = (props: MessageProps) => {
                     return null
                 }
             }) : ''
+        }
+        {
+            typing && <MessageCard message={"Typing..."} styles={displaySenderMessage} />
         }
     </div>
   )

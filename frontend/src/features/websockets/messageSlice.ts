@@ -9,6 +9,7 @@ export interface MesssageType {
 interface MessageInterface {
   allMessages: MesssageType[];
   leftMsg: string | null;
+  typing: boolean;
 }
 
 interface MessagePayload {
@@ -19,12 +20,19 @@ interface MessagePayload {
 const messageState: MessageInterface = {
   allMessages: [],
   leftMsg: null,
+  typing: false,
 };
 
 const messageSlice = createSlice({
   name: "message",
   initialState: messageState,
   reducers: {
+    setTyping: (state) => {
+      state.typing = true;
+    },
+    unSetTyping: (state) => {
+      state.typing = false;
+    },
     addMessages: (state, action: PayloadAction<MessagePayload>) => {
       state.allMessages = [
         ...state.allMessages,
@@ -48,7 +56,12 @@ const messageSlice = createSlice({
   },
 });
 
-export const { addMessages, deleteAllMessage, leftMessage } =
-  messageSlice.actions;
+export const {
+  addMessages,
+  deleteAllMessage,
+  leftMessage,
+  setTyping,
+  unSetTyping,
+} = messageSlice.actions;
 export const selectMessage = (state: RootState) => state.messageReducer;
 export default messageSlice.reducer;

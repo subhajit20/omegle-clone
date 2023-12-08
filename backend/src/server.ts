@@ -228,6 +228,17 @@ wss.on("connection", (ws: Nodes) => {
           })
         );
       }
+    } else if (data.typing) {
+      const { from, to } = data.typing;
+      if (userMapping[from] && userMapping[to]) {
+        userMapping[to].send(
+          JSON.stringify({
+            typing: {
+              from: "Typing...",
+            },
+          })
+        );
+      }
     }
   });
 

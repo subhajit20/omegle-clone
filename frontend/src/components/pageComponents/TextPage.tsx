@@ -10,15 +10,25 @@ import type { NotificationPlacement } from 'antd/es/notification/interface';
 import { SmileOutlined } from '@ant-design/icons';
 import DotCircle from '../loader/DotCircle';
 import ChatContainer from '../ui/container/ChatContainer';
+import { selectWebSocket } from '@/features/websockets/webSocketSlice';
+import { selectMessage } from '@/features/websockets/messageSlice';
+import { clearTimeout } from 'timers';
+import { selectUser } from '@/features/websockets/userSlice';
+import useWebSocketHook from '@/hooks/useWebSocketHook';
 
 const TextPage:React.FC = () => {
     const [message,setMessage] = useState<string | null>(null)
-    const { userId,roomId,roomMembers } = useAppSelector((state)=> state.userReducer);
-    const { allMessages,leftMsg } = useAppSelector((state)=> state.messageReducer);
+    const { userId,roomId,roomMembers } = useAppSelector(selectUser);
+    const { allMessages,leftMsg, typing } = useAppSelector(selectMessage);
+    const {WS} = useAppSelector(selectWebSocket);
     const [api, contextHolder] = notification.useNotification();
     const {search,leave,sendMessage} = useGeneralMethods({
         componentType:"textChat",
     });
+    useWebSocketHook({
+        type:"textChat",
+        WS:WS!
+    })
 
     const openNotification = (placement: NotificationPlacement,message?:string) => {
         api.info({
@@ -27,6 +37,27 @@ const TextPage:React.FC = () => {
         placement:placement
         });
     };
+
+    const writtingMessage = (delay:number) =>{
+        let timerId:any;
+        return (e:any) => {
+            clearTimeout(timerId);
+            timerId = setTimeout(()=>{
+                setMessage(e.target.value)
+                if(WS){
+                    WS.send(JSON.stringify({
+                        typing:{
+                            from:userId,
+                            to:userId === roomMembers[0] ? roomMembers[1] : roomMembers[0]
+                        }
+                    }))
+                }
+            },delay)
+
+        }
+    }
+
+    let lazyWrite = writtingMessage(2000);
 
     useEffect(()=>{
         if(roomMembers.length === 2){
@@ -51,7 +82,7 @@ const TextPage:React.FC = () => {
                 <DisplayMessages allMessages={allMessages} />
             </div>
             <FunctionBar 
-                writeMsg={(e) => setMessage(e.target.value)}
+                writeMsg={(e) => lazyWrite(e)}
                 searchRoom={search}
                 sendMsg={() => sendMessage(message!)}
                 existRoom={leave}
