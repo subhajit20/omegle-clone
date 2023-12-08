@@ -4,6 +4,7 @@ import MessageCard from '../ui/card/MessageCard';
 import { DisplayMessage } from '../../types/Message';
 import { selectMessage } from '@/features/websockets/messageSlice';
 import { useAppSelector } from '@/store/hook';
+import Wave from '../loader/Wave';
 
 interface MessageProps {
     allMessages:MesssageType[]
@@ -37,7 +38,7 @@ const DisplayMessages :React.FC<MessageProps> = (props: MessageProps) => {
             }) : ''
         }
         {
-            typing && <MessageCard message={"Typing..."} styles={displaySenderMessage} />
+            typing && <MessageCard message={"Typing..."} styles={<Wave />} />
         }
     </div>
   )
