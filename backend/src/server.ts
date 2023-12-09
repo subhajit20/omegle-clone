@@ -23,14 +23,20 @@ app.use(
 );
 
 // databases as mapping
-const userList: Nodes[] = [];
-const userMapping: WssMapping = {};
-const Rooms: Room = {};
-let user: User = {};
-let roomIds: string[] = [];
+// const userList: Nodes[] = [];
+// const userMapping: WssMapping = {};
+// const Rooms: Room = {};
+// let user: User = {};
+// let roomIds: string[] = [];
+
+// let uniqueId: string;
+// let roomId: string;
+
+import { userList, userMapping, Rooms, roomIds } from "../models/Db";
 
 let uniqueId: string;
 let roomId: string;
+let user: User = {};
 
 // setting websocket connection
 let connect = 0;

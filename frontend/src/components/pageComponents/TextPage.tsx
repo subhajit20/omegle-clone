@@ -8,7 +8,6 @@ import useGeneralMethods from '@/hooks/useGeneralMethods';
 import { notification } from 'antd';
 import type { NotificationPlacement } from 'antd/es/notification/interface';
 import { SmileOutlined } from '@ant-design/icons';
-import DotCircle from '../loader/DotCircle';
 import ChatContainer from '../ui/container/ChatContainer';
 import { selectWebSocket } from '@/features/websockets/webSocketSlice';
 import { selectMessage } from '@/features/websockets/messageSlice';
