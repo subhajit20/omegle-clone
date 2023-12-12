@@ -2,7 +2,7 @@ import { useEffect,useState } from 'react';
 import { useAppDispatch,useAppSelector } from '@/store/hook';
 import { joinUserToRoom, leftRoom, selectUser } from '@/features/websockets/userSlice';
 import { selectWebSocket } from '@/features/websockets/webSocketSlice';
-import { addMessages, deleteAllMessage } from '@/features/websockets/messageSlice';
+import { addMessages, deleteAllMessage, leftMessage, setTyping } from '@/features/websockets/messageSlice';
 import useWebSocket from './useWebSocket';
 
 interface useVideoChat{
@@ -106,10 +106,10 @@ const useVideoChat = (props: useVideoChat): any => {
                     
                     dispatch(leftRoom());
                     dispatch(deleteAllMessage());
-                    // dispatch(leftMessage({
-                    //     type:"leave",
-                    //     message:incommingData.leave
-                    // }))
+                    dispatch(leftMessage({
+                        type:"leave",
+                        message:incommingData.leave
+                    }))
                 }else if(incommingData.calling){
                     console.log(incommingData.calling);
                     console.log(roomMembers);
@@ -162,6 +162,10 @@ const useVideoChat = (props: useVideoChat): any => {
                     }catch{
                         console.log(iceInfo)
                     }
+                }else if(incommingData.typing){
+                    const {from} = incommingData.typing;
+                    console.log(from);
+                    dispatch(setTyping());
                 }
             }
         }

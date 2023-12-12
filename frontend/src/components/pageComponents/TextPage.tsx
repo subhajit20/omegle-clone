@@ -14,13 +14,17 @@ import { selectMessage } from '@/features/websockets/messageSlice';
 import { clearTimeout } from 'timers';
 import { selectUser } from '@/features/websockets/userSlice';
 import useWebSocketHook from '@/hooks/useWebSocketHook';
+import useNotificationHook from '@/hooks/useNotificationHook';
 
 const TextPage:React.FC = () => {
     const [message,setMessage] = useState<string | null>(null)
     const { userId,roomId,roomMembers } = useAppSelector(selectUser);
     const { allMessages,leftMsg, typing } = useAppSelector(selectMessage);
     const {WS} = useAppSelector(selectWebSocket);
-    const [api, contextHolder] = notification.useNotification();
+    const {
+        openNotification,
+        contextHolder
+    } = useNotificationHook()
     const {search,leave,sendMessage} = useGeneralMethods({
         componentType:"textChat",
     });
@@ -28,14 +32,6 @@ const TextPage:React.FC = () => {
         type:"textChat",
         WS:WS!
     })
-
-    const openNotification = (placement: NotificationPlacement,message?:string) => {
-        api.info({
-        message:message || 'Someone just joined.Start convertation',
-        icon: <SmileOutlined style={{ color: '#108ee9' }} />,
-        placement:placement
-        });
-    };
 
     const writtingMessage = (delay:number) =>{
         let timerId:any;
