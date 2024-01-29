@@ -1,11 +1,11 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import SunIcon from "@/icons/SunIcon";
-import MoonIcon from "@/icons/MoonIcon";
 import { useAppSelector, useAppDispatch } from "@/store/hook";
 import { selectTheme } from "@/features/theme/themeSlice";
 import { setDark, setLigth } from "@/features/theme/themeSlice";
+import { SunIcon, MoonIcon } from "@/icons";
+import Drawer from "../Drawer/Drawer";
 
 function Nav() {
   const { dark, light } = useAppSelector(selectTheme);
@@ -26,7 +26,8 @@ function Nav() {
           Omegle Clone
         </Link>
       </div>
-      <div className="navbar-end text-white">
+      <Drawer />
+      <div className="md:navbar-end text-white hidden">
         <Link className="navbar-item" href={"/"}>
           {dark && <SunIcon click={changeThemeLight} />}
           {light && <MoonIcon click={changeThemeDark} />}
