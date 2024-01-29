@@ -3,6 +3,7 @@ import webSocketSlice from "@/features/websockets/webSocketSlice";
 import userSlice from "@/features/websockets/userSlice";
 import messageSlice from "@/features/websockets/messageSlice";
 import videoSlice from "@/features/websockets/videoStream";
+import themeSlice from "@/features/theme/themeSlice";
 // ...
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
     userReducer: userSlice,
     messageReducer: messageSlice,
     videoReducer: videoSlice,
+    themeReducer: themeSlice,
   },
 });
 
