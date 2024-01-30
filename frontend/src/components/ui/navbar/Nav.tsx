@@ -22,7 +22,7 @@ function Nav() {
   return (
     <div
       className={`navbar ${light && "bg-[#F875AA] text-black"} ${
-        dark && "bg-[#872341] text-white"
+        dark && "bg-[#DA0C81] text-white"
       } transition-all duration-200 ease-in`}
     >
       <div className="navbar-start">
