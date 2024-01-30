@@ -5,27 +5,31 @@ interface themeInterface {
   dark: boolean;
   light: boolean;
   styles: string;
+  homePageStyles: string;
 }
 
 let themeState: themeInterface = {
   dark: false,
   light: true,
-  styles: "bg-white text-white",
+  styles: "bg-red-600 text-black",
+  homePageStyles: "",
 };
 
 const themeSlice = createSlice({
   name: "themeSlice",
   initialState: themeState,
   reducers: {
-    setDark: (state) => {
+    setDark: (state: themeInterface) => {
       state.dark = true;
       state.light = false;
-      state.styles = "bg-black text-white";
+      state.styles = "bg-[#F6B17A] text-white";
+      // state.homePageStyles = "bg-[#5C469C] text-white";
     },
-    setLigth: (state) => {
-      state.light = true;
+    setLigth: (state: themeInterface) => {
       state.dark = false;
-      state.styles = "bg-white text-text";
+      state.light = true;
+      state.styles = "bg-red-300 text-black";
+      // state.homePageStyles = "bg-[#E5D4FF] text-black";
     },
   },
 });
